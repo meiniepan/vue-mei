@@ -1,9 +1,33 @@
 <template>
     <el-container>
-        <el-aside width="200px">Aside</el-aside>
+        <el-aside width="200px">
+            <el-menu :default-openeds="['1', '2']"  :router="true" :default-active="$route.path">
+                <el-submenu index="1">
+                    <template slot="title"><i class="el-icon-message"></i>店铺</template>
+                    <el-menu-item-group>
+                        <template slot="title">
+                            <el-menu-item index="/overview">店铺概况</el-menu-item>
+                            <el-menu-item index="/content">店铺资料</el-menu-item>
+                            <el-menu-item index="/info">企业信息</el-menu-item>
+                            <el-menu-item index="/staff">店铺管理员</el-menu-item>
+                        </template>
+                    </el-menu-item-group>
+                </el-submenu>
+                <el-submenu index="2">
+                    <template slot="title"><i class="el-icon-message"></i>商品</template>
+                    <el-menu-item-group>
+                        <template slot="title">
+                            <el-menu-item index="/goods">商品管理</el-menu-item>
+                        </template>
+                    </el-menu-item-group>
+                </el-submenu>
+            </el-menu>
+        </el-aside>
         <el-container>
             <el-header>Header</el-header>
-            <el-main>Main</el-main>
+            <el-main>
+                <router-view></router-view>
+            </el-main>
             <el-footer>Footer</el-footer>
         </el-container>
     </el-container>
