@@ -12,7 +12,6 @@ import ShopStaff from '@/views/Shop/ShopStaff'
 /*商品*/
 import Goods from '@/views/Goods/Goods'
 
-
 Vue.use(Router)
 
 export default new Router({
