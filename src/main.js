@@ -8,6 +8,7 @@ import store from './store'
 Vue.use(ElementUI);
 
 import './style/base.css'
+import './style/index.scss'
 
 Vue.config.productionTip = false
 

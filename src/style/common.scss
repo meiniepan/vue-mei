@@ -1,0 +1,88 @@
+@mixin m-top($px){
+  margin-top:$px+px;
+}
+@mixin m-bottom($px){
+  margin-bottom:$px+px;
+}
+@mixin m-left($px){
+  margin-left:$px+px;
+}
+@mixin m-right($px){
+  margin-right:$px+px;
+}
+@mixin p-top($px){
+  padding-top:$px+px;
+}
+@mixin p-bottom($px){
+  padding-bottom:$px+px;
+}
+@mixin p-left($px){
+  padding-left:$px+px;
+}
+@mixin p-right($px){
+  padding-right:$px+px;
+}
+@mixin pos($pos){
+  position: $pos;
+  top:0;
+  left:0;
+}
+@mixin size($px){
+  font-size:$px+px;
+}
+@mixin wid($px){
+  width:$px+px;
+}
+@mixin hgt($px){
+  height:$px+px;
+}
+@mixin lh($px){
+  line-height: $px+px;
+}
+@mixin wh($px1,$px2){
+  width: $px1+px;
+  height: $px2+px;
+}
+@mixin br($px){
+  border-radius: $px+px;
+}
+.center{
+  text-align: center;
+}
+.block{
+  display: block;
+}
+.auto{
+  margin: 0 auto;
+}
+.border{
+  border-bottom: 1px solid rgba(229,229,229,1);
+}
+.bg{
+  background:rgba(247,248,253,1);
+}
+.bg2{
+  background:rgba(255,255,255,1);
+}
+.color{
+  color:#333;
+}
+.color2{
+  color:#999;
+}
+.color3{
+  color:#fff;
+}
+.br-bd{
+  border-radius:8px;
+  border:1px solid rgba(43,138,255,1);
+  color:rgba(43,138,255,1);
+}
+.br-bg{
+  border-radius:8px;
+  background:rgba(43,138,255,1);
+  @extend .color3;
+}
+.pointer{
+  cursor: pointer;
+}

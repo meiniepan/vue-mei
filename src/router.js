@@ -1,6 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
+/*登陆*/
+import Login from './views/Login/Login'
+import ForgetPassword from './views/Login/ForgetPassword'
+
 import Header from './views/Header'
 
 /*店铺*/
@@ -12,7 +16,6 @@ import ShopStaff from '@/views/Shop/ShopStaff'
 /*商品*/
 import Goods from '@/views/Goods/Goods'
 
-
 Vue.use(Router)
 
 export default new Router({
@@ -21,6 +24,14 @@ export default new Router({
   routes: [
     {
       path: '/',
+      component: Login
+    },
+    {
+      path: '/password',
+      component: ForgetPassword
+    },
+    {
+      path: '/overview',
       name: 'header',
       component: Header,
       children: [
