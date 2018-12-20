@@ -9,8 +9,8 @@
                 </div>
             </div>
             <div>
-                <el-button>发布商品</el-button>
-                <el-button>下载App</el-button>
+                <el-button @click="goodsAdd">发布商品</el-button>
+                <el-button @click="downloadApp">下载App</el-button>
             </div>
         </div>
         <ul class="order-quantity">
@@ -54,6 +54,13 @@
                 </el-table-column>
             </el-table>
         </div>
+
+        <div class="download-app" v-if="downloadState === 1" @click="closePopup">
+            <div class="popup-bg">
+                <p><img src="~@/assets/logo.png" alt="">Android下载</p>
+                <p><img src="~@/assets/logo.png" alt="">ios下载</p>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -79,8 +86,20 @@
                         price: '¥88',
                         salesVolume: '1888'
                     }
-                ]
+                ],
+                downloadState: 0,
             }
+        },
+        methods: {
+            goodsAdd() {
+                this.$router.push('/goodsAdd');
+            },
+            downloadApp() {
+                this.downloadState = 1;
+            },
+            closePopup() {
+                this.downloadState = 0;
+            },
         }
     }
 </script>
@@ -122,6 +141,29 @@
             height: 40px;
             display: inline-block;
             margin: 0 5px;
+        }
+    }
+    .download-app{
+        @include pos(absolute,0,0);
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,.5);
+        .popup-bg{
+            @include wh(500,320);
+            background: #fff;
+            border-radius:20px;
+            @include pos(absolute,50%,50%);
+            margin-left: -250px;
+            margin-top: -160px;
+            display: flex;
+            justify-content: space-around;
+            p{
+                margin-top: 80px;
+                img{
+                    @include wh(100,100);
+                    @include m-bottom(20);
+                }
+            }
         }
     }
 </style>
