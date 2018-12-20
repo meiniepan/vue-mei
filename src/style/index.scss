@@ -6,7 +6,7 @@
   width: 100%;
   height: 100%;
   background: url(~@/assets/bg.png);
-  @include pos(reletive);
+  @include pos(reletive,0,0);
   .login-pos{
     position: absolute;
     top: 50%;
@@ -48,4 +48,7 @@
 }
 .echarts{
   width: 100%;
+}
+.el-textarea__inner{
+  resize: none;
 }
