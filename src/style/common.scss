@@ -22,10 +22,10 @@
 @mixin p-right($px){
   padding-right:$px+px;
 }
-@mixin pos($pos){
+@mixin pos($pos,$px1,$px2){
   position: $pos;
-  top:0;
-  left:0;
+  top:$px1;
+  left:$px2;
 }
 @mixin size($px){
   font-size:$px+px;
