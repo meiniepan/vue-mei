@@ -16,6 +16,9 @@ import ShopStaff from '@/views/Shop/ShopStaff'
 /*商品*/
 import Goods from '@/views/Goods/Goods'
 
+/*设置*/
+import Configuration from '@/views/Configuration/Configuration'
+
 Vue.use(Router)
 
 export default new Router({
@@ -55,6 +58,10 @@ export default new Router({
               path: '/goods',
               component: Goods
           },
+          {
+              path: '/configuration',
+              component: Configuration
+          }
       ]
     },
     /*{
