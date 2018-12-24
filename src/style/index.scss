@@ -44,11 +44,74 @@
 }
 
 .el-table td{
-  text-align: center;
+  @extend .center;
 }
 .echarts{
   width: 100%;
 }
 .el-textarea__inner{
   resize: none;
+}
+.data-form{
+  .el-input,.el-select,.el-textarea{
+    width: 600px;
+    display: block;
+  }
+}
+/*upload tip*/
+.tips{
+  text-align: left;
+  display: block;
+  margin-top: 20px;
+}
+/*bank*/
+.open-address{
+  .el-form-item__content{
+    display: flex;
+  }
+  .el-select,.el-input{
+    width: 200px;
+  }
+}
+/*get code*/
+.bind-phone{
+  .el-form-item__content{
+    display: flex;
+  }
+  .el-input{
+    width: 488px;
+  }
+}
+/*alert*/
+.el-message-box{
+  width: 500px;
+  padding: 0 0 60px;
+  @include br(20);
+  .el-message-box__headerbtn{
+
+  }
+  .el-message-box__content{
+    padding: 0;
+    @extend .center;
+    @include m-top(82);
+    @include m-bottom(77);
+    @include size(24);
+  }
+  .el-message-box__btns{
+    padding: 0;
+    @extend .center;
+    .el-button{
+      @include wh(200,50);
+      @extend .br-bd;
+      @include size(16);
+    }
+    button:nth-child(2){
+      @extend .br-bg;
+      @include m-left(40);
+    }
+  }
+}
+/*staff component*/
+.el-checkbox__label{
+  line-height: 40px;
 }
