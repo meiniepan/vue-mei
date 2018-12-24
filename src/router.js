@@ -15,6 +15,7 @@ import ShopStaff from '@/views/Shop/ShopStaff'
 
 /*商品*/
 import Goods from '@/views/Goods/Goods'
+import GoodsAdd from '@/components/Goods/GoodsAdd'
 
 /*设置*/
 import Configuration from '@/views/Configuration/Configuration'
@@ -63,6 +64,10 @@ export default new Router({
               component: Configuration
           }
       ]
+    },
+    {
+      path: '/goodsAdd',
+      component: GoodsAdd
     },
     /*{
       path: '/about',
