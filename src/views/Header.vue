@@ -1,7 +1,7 @@
 <template>
     <el-container>
         <el-aside width="200px">
-            <el-menu :default-openeds="['1', '2','3']"  :router="true" :default-active="$route.path">
+            <el-menu :default-openeds="['1', '2','3','4']"  :router="true" :default-active="$route.path">
                 <el-submenu index="1">
                     <template slot="title"><i class="el-icon-message"></i>店铺</template>
                     <el-menu-item-group>
@@ -22,6 +22,15 @@
                     </el-menu-item-group>
                 </el-submenu>
                 <el-submenu index="3">
+                    <template slot="title"><i class="el-icon-message"></i>资产</template>
+                    <el-menu-item-group>
+                        <template slot="title">
+                            <el-menu-item index="/asset">收入概况</el-menu-item>
+                            <el-menu-item index="/order">订单结算</el-menu-item>
+                        </template>
+                    </el-menu-item-group>
+                </el-submenu>
+                <el-submenu index="4">
                     <template slot="title"><i class="el-icon-message"></i>设置</template>
                     <el-menu-item-group>
                         <template slot="title">
