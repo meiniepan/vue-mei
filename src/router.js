@@ -16,10 +16,16 @@ import ShopStaff from '@/views/Shop/ShopStaff'
 /*商品*/
 import Goods from '@/views/Goods/Goods'
 import GoodsAdd from '@/components/Goods/GoodsAdd'
+import GoodsModify from '@/components/Goods/GoodsModify'
+
 /*技工*/
 import Workers from '@/views/Workers/Workers'
 import AddWorker from '@/views/Workers/AddWorker'
 import EditWorker from '@/views/Workers/EditWorker'
+
+/*资产*/
+import IncomeOverview from '@/views/Asset/IncomeOverview'
+import OrderAccount from '@/views/Asset/OrderAccount'
 
 /*设置*/
 import Configuration from '@/views/Configuration/Configuration'
@@ -69,7 +75,23 @@ export default new Router({
           },
           {
               path: '/goods',
-              component: Goods
+              component: Goods,
+          },
+          {
+              path: '/goodsAdd',
+              component: GoodsAdd
+          },
+          {
+              path: '/goodsModify',
+              component: GoodsModify
+          },
+          {
+              path: '/asset',
+              component: IncomeOverview
+          },
+          {
+              path: '/order',
+              component: OrderAccount
           },
           {
               path: '/configuration',
@@ -80,10 +102,6 @@ export default new Router({
               component: Workers
           }
       ]
-    },
-    {
-      path: '/goodsAdd',
-      component: GoodsAdd
     },
     /*{
       path: '/about',
