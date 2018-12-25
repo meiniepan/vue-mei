@@ -29,6 +29,14 @@
                         </template>
                     </el-menu-item-group>
                 </el-submenu>
+                <el-submenu index="4">
+                    <template slot="title"><i class="el-icon-message"></i>技工</template>
+                    <el-menu-item-group>
+                        <template slot="title">
+                            <el-menu-item index="/workers">技工</el-menu-item>
+                        </template>
+                    </el-menu-item-group>
+                </el-submenu>
             </el-menu>
         </el-aside>
         <el-container>

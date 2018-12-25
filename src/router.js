@@ -16,6 +16,10 @@ import ShopStaff from '@/views/Shop/ShopStaff'
 /*商品*/
 import Goods from '@/views/Goods/Goods'
 import GoodsAdd from '@/components/Goods/GoodsAdd'
+/*技工*/
+import Workers from '@/views/Workers/Workers'
+import AddWorker from '@/views/Workers/AddWorker'
+import EditWorker from '@/views/Workers/EditWorker'
 
 /*设置*/
 import Configuration from '@/views/Configuration/Configuration'
@@ -34,6 +38,14 @@ export default new Router({
       path: '/password',
       component: ForgetPassword
     },
+      {
+          path: '/addWorker',
+          component: AddWorker
+      },
+      {
+          path: '/editWorker',
+          component: EditWorker
+      },
     {
       path: '/overview',
       name: 'header',
@@ -62,6 +74,10 @@ export default new Router({
           {
               path: '/configuration',
               component: Configuration
+          },
+          {
+              path: '/workers',
+              component: Workers
           }
       ]
     },
