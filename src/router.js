@@ -33,6 +33,10 @@ import Customer from '@/views/Customer/Customer'
 /*设置*/
 import Configuration from '@/views/Configuration/Configuration'
 
+// 订单
+import OrderList from '@/views/Order/OrderList'
+import OrderOverview from '@/views/Order/OrderOverview'
+import OrderDetail from '@/views/Order/OrderDetail'
 
 Vue.use(Router)
 
@@ -96,6 +100,18 @@ export default new Router({
           {
               path: '/order',
               component: OrderAccount
+          },
+          {
+              path:'/orderList',
+              component:OrderList
+          },
+          {
+              path:'/orderOverview',
+              component:OrderOverview
+          },
+          {
+              path:'orderDetail',
+              component:OrderDetail
           },
           {
               path: '/customer',

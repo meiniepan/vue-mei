@@ -1,7 +1,7 @@
 <template>
     <el-container>
         <el-aside width="200px">
-            <el-menu :default-openeds="['1', '2','3','4']"  :router="true" :default-active="$route.path">
+            <el-menu :default-openeds="['1', '2','3','4','7']"  :router="true" :default-active="$route.path">
                 <el-submenu index="1">
                     <template slot="title"><i class="el-icon-message"></i>店铺</template>
                     <el-menu-item-group>
@@ -18,6 +18,15 @@
                     <el-menu-item-group>
                         <template slot="title">
                             <el-menu-item index="/goods">商品管理</el-menu-item>
+                        </template>
+                    </el-menu-item-group>
+                </el-submenu>
+                <el-submenu index="7">
+                    <template slot="title"><i class="el-icon-message"></i>订单</template>
+                    <el-menu-item-group>
+                        <template slot="title">
+                            <el-menu-item index="/orderOverview">订单概况</el-menu-item>
+                            <el-menu-item index="/orderList">所有订单</el-menu-item>
                         </template>
                     </el-menu-item-group>
                 </el-submenu>
