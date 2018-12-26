@@ -27,8 +27,12 @@ import EditWorker from '@/views/Workers/EditWorker'
 import IncomeOverview from '@/views/Asset/IncomeOverview'
 import OrderAccount from '@/views/Asset/OrderAccount'
 
+/*客户*/
+import Customer from '@/views/Customer/Customer'
+
 /*设置*/
 import Configuration from '@/views/Configuration/Configuration'
+
 
 Vue.use(Router)
 
@@ -94,12 +98,16 @@ export default new Router({
               component: OrderAccount
           },
           {
-              path: '/configuration',
-              component: Configuration
+              path: '/customer',
+              component: Customer
           },
           {
               path: '/workers',
               component: Workers
+          },
+          {
+              path: '/configuration',
+              component: Configuration
           }
       ]
     },
