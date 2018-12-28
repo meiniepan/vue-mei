@@ -115,3 +115,59 @@
 .el-checkbox__label{
   line-height: 40px;
 }
+/*goods*/
+.flex-style{
+  .el-form-item__content{
+    display: flex;
+    justify-content: start;
+  }
+}
+/*add-spec*/
+.add-spec{
+  td{
+    padding: 0;
+  }
+  .cell{
+    padding-left: 0!important;
+    padding-right: 0;
+  }
+  .el-input{
+    width: 100%;
+  }
+  .el-input__inner{
+    border: none;
+  }
+}
+
+.time-table{
+  display:block;
+  margin:10px 0;
+  clear: both;
+  border:1px solid #d8d8d8;
+  tr{
+    display:flex;
+    border-bottom:1px solid #d8d8d8;
+    th,td{
+      flex:1;
+      padding: 10px 0;
+    }
+  }
+  tr:last-child{
+    border-bottom:none;
+  }
+  th{
+    border:none;
+  }
+  td{
+    border:none;
+    border-left:1px solid #d8d8d8;
+    text-align:center;
+    .el-input{
+      width:90%!important;
+    }
+  }
+  td.canchoose{
+    cursor:pointer;
+  }
+  td.selecteds{background-color:#409EFF;color:#fff}
+}
