@@ -9,7 +9,9 @@
                     </el-form-item>
                     <el-form-item label="服务图片：">
                         <el-upload style="text-align: left"
-                                   action="https://jsonplaceholder.typicode.com/posts/"
+                                   action="string"
+                                   accept="image/jpeg,image/gif,image/png"
+                                   :show-file-list="false"
                                    list-type="picture-card"
                                    :on-preview="handlePictureCardPreview"
                                    :on-remove="handleRemove">
@@ -25,15 +27,11 @@
                     </el-form-item>
                     <el-form-item label="市场价格：" class="flex-style">
                         <el-input v-model="goodsForm.price"></el-input>
-                        <el-checkbox-group v-model="goodsForm.priceType">
-                            <el-checkbox label="勾选不显示" name="type"></el-checkbox>
-                        </el-checkbox-group>
+                        <el-checkbox v-model="priceType" label="勾选不显示" name="priceType"></el-checkbox>
                     </el-form-item>
                     <el-form-item label="促销广告语：" class="flex-style">
                         <el-input v-model="goodsForm.advert"></el-input>
-                        <el-checkbox-group v-model="goodsForm.priceType">
-                            <el-checkbox label="勾选不显示" name="advertType"></el-checkbox>
-                        </el-checkbox-group>
+                        <el-checkbox v-model="advertType" label="勾选不显示" name="advertType"></el-checkbox>
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -43,8 +41,7 @@
                 <el-col :span="20">
                     <el-form-item label="选择分类：">
                         <el-select v-model="goodsForm.classify" placeholder="请选择分类">
-                            <el-option label="区域一" value="111"></el-option>
-                            <el-option label="区域二" value="222"></el-option>
+                            <el-option v-for="(classify,key) in classifyList" :key="key" :label="classify" :value="classify"></el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
@@ -58,47 +55,49 @@
                             <el-radio label="0">无规格</el-radio>
                             <el-radio label="1">自定义规格</el-radio>
                         </el-radio-group>
-                        <el-table
-                                class="add-spec"
-                                v-if='goodsForm.spec === "1"'
-                                :data="goodsForm.addSpec"
-                                border
-                                style="width: 100%">
-                            <el-table-column
-                                    prop="specName"
-                                    label="规格名称">
-                                <template slot-scope="scope">
-                                    <el-input ></el-input>
-                                </template>
-                            </el-table-column>
-                            <el-table-column
-                                    prop="unitPrice"
-                                    label="单价（元）">
-                                <template slot-scope="scope">
-                                    <el-input ></el-input>
-                                </template>
-                            </el-table-column>
-                            <el-table-column
-                                    prop="stock"
-                                    label="库存">
-                                <template slot-scope="scope">
-                                    <el-input ></el-input>
-                                </template>
-                            </el-table-column>
-                            <el-table-column
-                                    fixed="right"
-                                    label="操作">
-                                <template slot-scope="scope">
-                                    <el-button
-                                            @click.native.prevent="deleteRow(scope.$index, goodsForm.addSpec)"
-                                            type="text"
-                                            size="small">
-                                        删除
-                                    </el-button>
-                                </template>
-                            </el-table-column>
-                        </el-table>
-                        <el-button @click="addSpec" v-if='goodsForm.spec === "1"'>添加规格</el-button>
+                        <div v-if='goodsForm.spec === "1"'>
+                            <el-table
+                                    class="add-spec"
+                                    :data="goodsForm.addSpec"
+                                    v-for="item in goodsForm.addSpec"
+                                    border
+                                    style="width: 100%">
+                                <el-table-column
+                                        prop="specName"
+                                        label="规格名称">
+                                    <template slot-scope="scope">
+                                        <el-input v-model="item.specName"></el-input>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column
+                                        prop="unitPrice"
+                                        label="单价（元）">
+                                    <template slot-scope="scope">
+                                        <el-input v-model="item.unitPrice"></el-input>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column
+                                        prop="stock"
+                                        label="库存">
+                                    <template slot-scope="scope">
+                                        <el-input v-model="item.stock"></el-input>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column
+                                        fixed="right"
+                                        label="操作">
+                                    <template slot-scope="scope">
+                                        <el-button
+                                                @click.native.prevent="deleteRow(scope.$index, goodsForm.addSpec)"
+                                                type="text"
+                                                size="small">
+                                            删除
+                                        </el-button>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                            <el-button @click="addSpec">添加规格</el-button>
+                        </div>
                     </el-form-item>
                     <el-form-item label="总库存：">
                         <el-input v-model="goodsForm.totalInventory" placeholder="请填写库存"></el-input>
@@ -135,47 +134,88 @@
                     </el-form-item>
                 </el-col>
             </el-row>
+            <editor id='tinymce' v-model='goodsForm.tinymceHtml' :init='init'></editor>
         </el-form>
-        <el-button type="primary" @click="goodsModify">下一步编辑详情信息</el-button>
+        <el-button type="primary" class="submit-audit" @click="submitAudit">提交审核</el-button>
     </div>
 </template>
 
 <script>
+    import tinymce from 'tinymce/tinymce'
+    import 'tinymce/themes/modern/theme'
+    import Editor from '@tinymce/tinymce-vue'
+    import 'tinymce/plugins/image'
+    import 'tinymce/plugins/link'
+    import 'tinymce/plugins/code'
+    import 'tinymce/plugins/table'
+    import 'tinymce/plugins/lists'
+    import 'tinymce/plugins/contextmenu'
+    import 'tinymce/plugins/wordcount'
+    import 'tinymce/plugins/colorpicker'
+    import 'tinymce/plugins/textcolor'
     export default {
         name: "GoodsAdd",
+        components: {Editor},
         data() {
             return {
                 goodsForm: {
-                    serviceName: '',
-                    dialogImageUrl: '',
+                    serviceName: '', //服务名称
+                    dialogImageUrl: '', //服务图片
                     dialogVisible: false,
-                    unit: '',
-                    price: '',
-                    priceType: '',
-                    advert: '',
-                    advertType: '',
-                    classify: '',
+                    unit: '', //计量单位
+                    price: '', //市场价
+                    advert: '', //广告语
+                    classify: '', //服务分类
                     spec: '1',//是否有规格 0：无    1：有
                     addSpec: [{
                         specName: '',
                         unitPrice: '',
                         stock: ''
-                    }],
-                    totalInventory: '',
+                    }], //规格数组
+                    totalInventory: '', //总库存
                     orderForm: '0', //上门方式 0：上门 1：站点
-                    orderCost: '',
-                    interval: '请选择',
-                    times: [],
+                    orderCost: '', //上门费用
+                    interval: '请选择', //时间间隔
+                    times: [], //时间段
+                    tinymceHtml: '', //富文本
                 },
-                intervalArr: [2,3,4,6],
+                priceType: false, //市场价显示否
+                advertType: false, //广告语显示否
+                intervalArr: [2,3,4,6], //时间间隔数组
                 timePeriod: [],
+                classifyList: [],   //分类列表
+                init: {
+                    language_url: '/tinymce/zh_CN.js',
+                    language: 'zh_CN',
+                    skin_url: '/tinymce/skins/lightgray',
+                    height: 300,
+                    plugins: 'link lists image code table colorpicker textcolor wordcount contextmenu',
+                    toolbar:
+                        'bold italic underline strikethrough | fontsizeselect | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | outdent indent blockquote | undo redo | link unlink image code | removeformat',
+                    images_upload_handler: (blobInfo, success, failure) => {
+                        const img = 'data:image/jpeg;base64,' + blobInfo.base64();
+                        success(img)
+                    }
+                }
             }
+        },
+        created() {
+            let classify = {
+                "status": 1
+            };
+            this.$http.getClassify(classify).then((res) => {
+                this.classifyList = res;
+            })
+        },
+        mounted () {
+            tinymce.init({});
         },
         methods: {
             handleRemove(file, fileList) {
                 console.log(file, fileList);
             },
             handlePictureCardPreview(file) {
+                console.log(file);
                 this.infoForm.dialogImageUrl = file.url;
                 this.infoForm.dialogVisible = true;
             },
@@ -221,13 +261,32 @@
                     }
                 }
             },
-            goodsModify() { //跳转富文本
-                this.$router.push('/goodsModify')
+            submitAudit() {
+                console.log(this.goodsForm.tinymceHtml);
+                /*市场价格*/
+                this.priceType === true ? this.goodsForm.price = 0 : this.goodsForm.price;
+                let data = {
+                    "shopId": 12,
+                    "name": this.goodsForm.serviceName, //服务名称
+                    "images": ["image1", "image2"], //服务图片
+                    "price": Number(this.goodsForm.price), //市场价,
+                    "tag": this.goodsForm.classify, //服务分类
+                    "specification": ['a1','a2'], //服务规格
+                    "inventory": Number(this.goodsForm.totalInventory), //库存
+                    "type": Number(this.goodsForm.orderForm), //服务方式
+                    "underline": Number(this.goodsForm.orderCost), //上门费用
+                    "content": this.goodsForm.tinymceHtml, //详情
+                };
+                this.$http.addLogin(data).then((res) => {
+                    console.log(res);
+                });
             }
         }
     }
 </script>
 
 <style scoped lang="scss">
-
+    .submit-audit{
+        margin-top: 50px;
+    }
 </style>
