@@ -262,7 +262,7 @@
                 }
             },
             submitAudit() {
-                console.log(this.goodsForm.tinymceHtml);
+                //console.log(this.goodsForm.tinymceHtml);
                 /*市场价格*/
                 this.priceType === true ? this.goodsForm.price = 0 : this.goodsForm.price;
                 let data = {
@@ -277,7 +277,7 @@
                     "underline": Number(this.goodsForm.orderCost), //上门费用
                     "content": this.goodsForm.tinymceHtml, //详情
                 };
-                this.$http.addLogin(data).then((res) => {
+                this.$http.addGoods(data).then((res) => {
                     console.log(res);
                 });
             }

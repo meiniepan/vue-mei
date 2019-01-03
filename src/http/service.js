@@ -5,21 +5,23 @@ axios.defaults.headers.post['Content-Type'] = 'application/json';
 axios.defaults.baseURL = BASE_URL;
 
 const interfaceData = {
-    /*login*/
-    addLogin(paramsdata) {
+    /*服务分类*/
+    getClassify(classify) {
+        return axios.get('/servicecategory/get',classify)
+            .then((res) => {
+                if(res.data.status === 200){
+                    return res.data.cateList;
+                }
+            })
+    },
+    /*添加商品*/
+    addGoods(paramsdata) {
         return axios.post('/service/create', paramsdata)
             .then((res) => {
                 return res.data;
             });
 
     },
-    /*获取*/
-    getList(paramsdata) {
-        return axios.get('/servicecategory/get',paramsdata)
-            .then((res) => {
-            return res.data;
-        })
-    }
 };
 export default interfaceData;
 
