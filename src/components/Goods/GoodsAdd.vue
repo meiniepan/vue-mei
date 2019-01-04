@@ -26,7 +26,7 @@
                         <el-input v-model="goodsForm.unit"></el-input>
                     </el-form-item>
                     <el-form-item label="市场价格：" class="flex-style">
-                        <el-input v-model="goodsForm.price"></el-input>
+                        <el-input v-model.number="goodsForm.price"></el-input>
                         <el-checkbox v-model="priceType" label="勾选不显示" name="priceType"></el-checkbox>
                     </el-form-item>
                     <el-form-item label="促销广告语：" class="flex-style">
@@ -56,51 +56,37 @@
                             <el-radio label="1">自定义规格</el-radio>
                         </el-radio-group>
                         <div v-if='goodsForm.spec === "1"'>
-                            <el-table
-                                    class="add-spec"
-                                    :data="goodsForm.addSpec"
-                                    v-for="item in goodsForm.addSpec"
-                                    border
-                                    style="width: 100%">
-                                <el-table-column
-                                        prop="specName"
-                                        label="规格名称">
-                                    <template slot-scope="scope">
-                                        <el-input v-model="item.specName"></el-input>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column
-                                        prop="unitPrice"
-                                        label="单价（元）">
-                                    <template slot-scope="scope">
-                                        <el-input v-model="item.unitPrice"></el-input>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column
-                                        prop="stock"
-                                        label="库存">
-                                    <template slot-scope="scope">
-                                        <el-input v-model="item.stock"></el-input>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column
-                                        fixed="right"
-                                        label="操作">
-                                    <template slot-scope="scope">
-                                        <el-button
-                                                @click.native.prevent="deleteRow(scope.$index, goodsForm.addSpec)"
-                                                type="text"
-                                                size="small">
-                                            删除
-                                        </el-button>
-                                    </template>
-                                </el-table-column>
-                            </el-table>
+                            <table class="add-spec" border="1">
+                                <thead>
+                                    <tr>
+                                        <th>规格</th>
+                                        <th>单价（元）</th>
+                                        <th>库存</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(spec,key) in goodsForm.addSpec" :key="key">
+                                        <td>
+                                            <el-input v-model.number="spec.specName"></el-input>
+                                        </td>
+                                        <td>
+                                            <el-input v-model.number="spec.unitPrice"></el-input>
+                                        </td>
+                                        <td>
+                                            <el-input v-model.number="spec.stock"></el-input>
+                                        </td>
+                                        <td>
+                                            <el-button @click="deleteRow(key)">删除</el-button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                             <el-button @click="addSpec">添加规格</el-button>
                         </div>
                     </el-form-item>
                     <el-form-item label="总库存：">
-                        <el-input v-model="goodsForm.totalInventory" placeholder="请填写库存"></el-input>
+                        <el-input v-model.number="goodsForm.totalInventory" placeholder="请填写库存"></el-input>
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -108,14 +94,14 @@
             <el-row>
                 <el-col :span="4"><div class="grid-content bg-purple">服务方式</div></el-col>
                 <el-col :span="20">
-                    <el-form-item label="订单方式：" style="text-align: left">
+                    <el-form-item label="服务方式：" style="text-align: left">
                         <el-radio-group v-model="goodsForm.orderForm">
                             <el-radio label="0">上门服务</el-radio>
                             <el-radio label="1">站点服务</el-radio>
                         </el-radio-group>
                     </el-form-item>
                     <el-form-item label="上门费用：" v-if="this.goodsForm.orderForm === '0'">
-                        <el-input v-model="goodsForm.orderCost" placeholder="请填写金额（元）"></el-input>
+                        <el-input v-model.number="goodsForm.orderCost" placeholder="请填写金额（元）"></el-input>
                     </el-form-item>
                     <el-form-item label="时间间隔："  v-if="this.goodsForm.orderForm === '0'">
                         <el-select v-model='goodsForm.interval' size='small' @change='intervalChange'>
@@ -219,8 +205,14 @@
                 this.infoForm.dialogImageUrl = file.url;
                 this.infoForm.dialogVisible = true;
             },
-            deleteRow(index, rows) {
-                rows.splice(index, 1);
+            deleteRow(index) {
+                console.log(this.goodsForm.addSpec.length);
+                if(this.goodsForm.addSpec.length <= 1){
+                    return;
+                    console.log(11);
+                }else{
+                    this.goodsForm.addSpec.splice(index, 1);
+                }
             },
             addSpec() {
                 this.goodsForm.addSpec.push({
@@ -262,23 +254,28 @@
                 }
             },
             submitAudit() {
-                //console.log(this.goodsForm.tinymceHtml);
+                let specArr = [];
+                for(let item in this.goodsForm.addSpec){
+                    specArr.push(JSON.stringify(this.goodsForm.addSpec[item]));
+                }
                 /*市场价格*/
                 this.priceType === true ? this.goodsForm.price = 0 : this.goodsForm.price;
                 let data = {
                     "shopId": 12,
                     "name": this.goodsForm.serviceName, //服务名称
                     "images": ["image1", "image2"], //服务图片
-                    "price": Number(this.goodsForm.price), //市场价,
+                    "price": this.goodsForm.price, //市场价,
                     "tag": this.goodsForm.classify, //服务分类
-                    "specification": ['a1','a2'], //服务规格
-                    "inventory": Number(this.goodsForm.totalInventory), //库存
+                    "specification": specArr, //服务规格
+                    "inventory": this.goodsForm.totalInventory, //库存
                     "type": Number(this.goodsForm.orderForm), //服务方式
-                    "underline": Number(this.goodsForm.orderCost), //上门费用
+                    "underline": this.goodsForm.orderCost, //上门费用
                     "content": this.goodsForm.tinymceHtml, //详情
                 };
                 this.$http.addGoods(data).then((res) => {
-                    console.log(res);
+                    if(res.status === 200){
+                        this.$route.push('/goods');
+                    }
                 });
             }
         }
@@ -286,6 +283,9 @@
 </script>
 
 <style scoped lang="scss">
+    .spec-table{
+
+    }
     .submit-audit{
         margin-top: 50px;
     }

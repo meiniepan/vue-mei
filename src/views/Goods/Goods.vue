@@ -10,14 +10,14 @@
                 :data="goodsData"
                 tooltip-effect="dark"
                 style="width: 100%"
-                @selection-change="handleSelectionChange">
+                @selection-change="batchSelectionGoods">
             <el-table-column
                     type="selection"
                     label="全选"
                     width="55">
             </el-table-column>
             <el-table-column
-                    prop="titlePrice"
+                    prop=""
                     label="">
                 <template slot-scope="scope">
                     <p style="line-height: 20px">{{ scope.row.title }}</p>
@@ -42,7 +42,15 @@
             </el-table-column>
             <el-table-column
                     prop="state"
-                    label="商品状态">
+                    label="商品状态"
+                    :filters="[{ text: 0, value: 0 }, { text: 1, value: 1 }]"
+                    :filter-method="filterTag"
+                    filter-placement="bottom-end">
+                <template slot-scope="scope">
+                    <el-tag
+                            :type="scope.row.state === '1' ? 'primary' : 'success'"
+                            disable-transitions>{{scope.row.state}}</el-tag>
+                </template>
             </el-table-column>
             <el-table-column
                     label="操作"
@@ -55,46 +63,49 @@
         </el-table>
         <div class="goods-btn">
             <div>
-                <el-button>下架</el-button>
+                <el-button @click="goodsShelves">下架</el-button>
                 <el-button>删除</el-button>
             </div>
             <div>
-                <el-button>上一页</el-button>
-                <el-button>下一页</el-button>
-                每页20条
+                <el-button @click="lastPage">上一页</el-button>
+                <el-button @click="nextPage">下一页</el-button>
+                每页10条
             </div>
         </div>
     </div>
 </template>
 
 <script>
+    import { timestampToString } from '../../http/common'
     export default {
         name: "Goods",
         data () {
             return {
-                goodsData: [{
-                    title: '服务（商品）主标题，最长50字，一行显示不完全，折行显示',
-                    price: '¥350',
-                    stock: 100,
-                    sales: 99,
-                    createTime: '2016-05-03 15:00:00',
-                    classify: '王小虎',
-                    state: '销售中'
-                },{
-                    title: '服务（商品）主标题，最长50字',
-                    price: '¥350',
-                    stock: 100,
-                    sales: 99,
-                    createTime: '2016-05-03 15:00:00',
-                    classify: '王小虎',
-                    state: '销售中'
-                }],
-                multipleSelection: []
+                goodsData: [],
+                batchGoods: [],
+                page: 1,
             }
         },
+        created() {
+            this.getGoodsData(this.page);
+        },
         methods: {
-            handleSelectionChange(val) {
-                this.multipleSelection = val;
+            filterTag(value, row) {
+                return row.state === value;
+            },
+            lastPage() {
+                this.page-=1;
+                this.getGoodsData(this.page);
+            },
+            nextPage() { //下一页
+                this.page+=1;
+                this.getGoodsData(this.page);
+            },
+            batchSelectionGoods(val) {
+                this.batchGoods = [];
+                for(let serviceId in val){
+                    this.batchGoods.push(val[serviceId].serviceId);
+                }
             },
             releaseGoods(row) { //发布或者编辑
                 this.$router.push('/goodsAdd')
@@ -116,6 +127,52 @@
                     });
                 });
             },
+            /*商品下架*/
+            goodsShelves() {
+                this.$confirm('确定要批量下架商品吗?', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                }).then(() => {
+                    let shelvesData = {
+                        shopId: 12,
+                        serviceId: this.batchGoods
+                    };
+                    this.$http.goodsShelves(shelvesData).then(() => {
+                        this.$message({
+                            type: 'success',
+                            message: '下架成功!'
+                        });
+                        this.getGoodsData(1);
+                    });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消下架'
+                    });
+                });
+            },
+            /*获取所有商品*/
+            getGoodsData(page) {
+                this.goodsData = [];
+                let shopData = {
+                    "shopId": 12,
+                    "page": page
+                };
+                this.$http.getGoods(shopData).then((res) => {
+                    for(let item in res){
+                        this.goodsData.push({
+                            title: res[item].name,
+                            price: '¥'+res[item].price,
+                            stock: res[item].inventory,
+                            sales: res[item].sales,
+                            createTime: timestampToString(res[item].createTime),
+                            classify: res[item].tag,
+                            state: res[item].status,
+                            serviceId: res[item].serviceId
+                        });
+                    }
+                })
+            }
         }
     }
 </script>
