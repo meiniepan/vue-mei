@@ -52,14 +52,6 @@ export default new Router({
       path: '/password',
       component: ForgetPassword
     },
-      {
-          path: '/addWorker',
-          component: AddWorker
-      },
-      {
-          path: '/editWorker',
-          component: EditWorker
-      },
     {
       path: '/overview',
       name: 'header',
@@ -120,6 +112,14 @@ export default new Router({
           {
               path: '/workers',
               component: Workers
+          },
+          {
+              path: '/addWorker',
+              component: AddWorker
+          },
+          {
+              path: '/editWorker',
+              component: EditWorker
           },
           {
               path: '/configuration',

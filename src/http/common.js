@@ -15,7 +15,7 @@ let timestampToString = (timestamp) => {
     let minutes = date.getMinutes();
     let s = date.getSeconds();
 
-    return y + '-' + (m < 10 ? '0' + m : m) + '-' + (d < 10 ? '0' + d : d) + ' ' + h + ':' + minutes + ':' + s;
+    return y + '-' + (m < 10 ? '0' + m : m) + '-' + (d < 10 ? '0' + d : d) + ' ' + (h < 10 ? '0' + h : h) + ':' + (minutes < 10 ? '0' + minutes : minutes) + ':' + (s < 10 ? '0' + s : s);
 };
 
 export {
