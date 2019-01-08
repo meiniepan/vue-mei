@@ -9,10 +9,10 @@
                     </el-form-item>
                     <el-form-item label="服务图片：">
                         <el-upload style="text-align: left"
-                                   action="string"
+                                   action="http://192.168.1.251:5000/files/add"
                                    accept="image/jpeg,image/gif,image/png"
-                                   :show-file-list="false"
                                    list-type="picture-card"
+                                   :on-success="uploadSuccess"
                                    :on-preview="handlePictureCardPreview"
                                    :on-remove="handleRemove">
                             <i class="el-icon-plus"></i>
@@ -146,8 +146,9 @@
             return {
                 goodsForm: {
                     serviceName: '', //服务名称
-                    dialogImageUrl: '', //服务图片
+                    dialogImageUrl: '',
                     dialogVisible: false,
+                    serviceImg: [], //服务图片
                     unit: '', //计量单位
                     price: '', //市场价
                     advert: '', //广告语
@@ -182,7 +183,7 @@
                         const img = 'data:image/jpeg;base64,' + blobInfo.base64();
                         success(img)
                     }
-                }
+                },
             }
         },
         created() {
@@ -197,13 +198,20 @@
             tinymce.init({});
         },
         methods: {
+            uploadSuccess(response, file, fileList) {
+                this.goodsForm.serviceImg = [];
+                if(response.status === 200){
+                    for(let file in fileList){
+                        this.goodsForm.serviceImg.push(fileList[file].response.fileHash)
+                    }
+                }
+            },
             handleRemove(file, fileList) {
                 console.log(file, fileList);
             },
             handlePictureCardPreview(file) {
-                console.log(file);
-                this.infoForm.dialogImageUrl = file.url;
-                this.infoForm.dialogVisible = true;
+                this.goodsForm.dialogImageUrl = file.url;
+                this.goodsForm.dialogVisible = true;
             },
             deleteRow(index) {
                 console.log(this.goodsForm.addSpec.length);
@@ -263,7 +271,7 @@
                 let data = {
                     "shopId": 12,
                     "name": this.goodsForm.serviceName, //服务名称
-                    "images": ["image1", "image2"], //服务图片
+                    "images": this.goodsForm.serviceImg, //服务图片
                     "price": this.goodsForm.price, //市场价,
                     "tag": this.goodsForm.classify, //服务分类
                     "specification": specArr, //服务规格
@@ -274,7 +282,7 @@
                 };
                 this.$http.addGoods(data).then((res) => {
                     if(res.status === 200){
-                        this.$route.push('/goods');
+                        this.$router.push('/goods');
                     }
                 });
             }

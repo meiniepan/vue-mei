@@ -15,7 +15,7 @@
             </el-col>
             <el-col :span="8">
                 <el-card shadow="always">
-                    <p>1200.00</p>
+                    <p>{{salesData}}.00</p>
                     <p>总销售额（元）</p>
                 </el-card>
             </el-col>
@@ -29,6 +29,20 @@
     export default {
         name: "IncomeOverview",
         components: { SaleDisplay },
+        data() {
+            return {
+                salesData: ''
+            }
+        },
+        created() {
+            let data = {
+                "shopId": "5c2775a18ffaedc2ba1cf2f6"
+            }
+            this.$http.getTotalSales(data)
+                .then((res) => {
+                    this.salesData = res;
+            })
+        }
     }
 </script>
 
