@@ -20,12 +20,7 @@
 
             <el-form-item label="权限（多选）：" prop="type">
                 <el-checkbox-group  v-model="staffForm.type">
-                    <el-checkbox label="商品管理" name="type"></el-checkbox>
-                    <el-checkbox label="店铺管理" name="type"></el-checkbox>
-                    <el-checkbox label="资产管理" name="type"></el-checkbox>
-                    <el-checkbox label="订单管理" name="type"></el-checkbox>
-                    <el-checkbox label="技工管理" name="type"></el-checkbox>
-                    <el-checkbox label="用户管理" name="type"></el-checkbox>
+                    <el-checkbox v-for="type in checkbox" :label="type.id" name="type" :key="type.id">{{type.name}}</el-checkbox>
                 </el-checkbox-group>
             </el-form-item>
 
@@ -46,7 +41,7 @@
             </el-table>
 
             <el-form-item  class="preserve-btn">
-                <el-button type="primary">保存</el-button>
+                <el-button type="primary" @click="keepAdmin('staffForm')">保存</el-button>
             </el-form-item>
 
         </el-form>
@@ -98,9 +93,10 @@
                         { validator: validatePass2, trigger: 'blur', required: true }
                     ],
                     type: [
-                        { type: 'array', required: true, message: '请至少选择一个活动性质', trigger: 'change' }
+                        { type: 'array', required: true, message: '请至少选择一个权限', trigger: 'change' }
                     ],
                 },
+                checkbox: [],
                 staffType: [
                     {
                         type: '商品管理',
@@ -122,6 +118,30 @@
                         authority: '技工人员管理、修改等权限'
                     }
                 ]
+            }
+        },
+        created() {
+            this.$http.getAdminAuthority().then((res) => {
+                this.checkbox = res;
+            })
+        },
+        methods: {
+            keepAdmin(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        let adminData = {
+                            "name": this.staffForm.name,
+                            "shopId": "5c27753e8ffaedc2a6bc4b71",
+                            "mobile": this.staffForm.account,
+                            "password": this.staffForm.checkPass,
+                            "permissionList": this.staffForm.type
+                        };
+                        this.$http.addShopAdmin(adminData).then((res) => {
+                            console.log(res);
+                            //this.$route.push('/staff');
+                        })
+                    }
+                })
             }
         }
     }

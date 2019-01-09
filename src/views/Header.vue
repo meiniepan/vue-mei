@@ -1,7 +1,7 @@
 <template>
     <el-container>
         <el-aside width="200px">
-            <el-menu :default-openeds="['1', '2','3']"  :router="true" :default-active="$route.path">
+            <el-menu :default-openeds="['1', '2','3','4','7']"  :router="true" :default-active="$route.path">
                 <el-submenu index="1">
                     <template slot="title"><i class="el-icon-message"></i>店铺</template>
                     <el-menu-item-group>
@@ -21,7 +21,36 @@
                         </template>
                     </el-menu-item-group>
                 </el-submenu>
+                <el-submenu index="7">
+                    <template slot="title"><i class="el-icon-message"></i>订单</template>
+                    <el-menu-item-group>
+                        <template slot="title">
+                            <el-menu-item index="/orderOverview">订单概况</el-menu-item>
+                            <el-menu-item index="/orderList">所有订单</el-menu-item>
+                        </template>
+                    </el-menu-item-group>
+                </el-submenu>
                 <el-submenu index="3">
+                    <template slot="title"><i class="el-icon-message"></i>资产</template>
+                    <el-menu-item-group>
+                        <template slot="title">
+                            <el-menu-item index="/asset">收入概况</el-menu-item>
+                            <el-menu-item index="/order">订单结算</el-menu-item>
+                        </template>
+                    </el-menu-item-group>
+                </el-submenu>
+                <el-menu-item index="4" route="/customer">
+                    <template slot="title"><i class="el-icon-message"></i>客户</template>
+                </el-menu-item>
+                <el-submenu index="5">
+                    <template slot="title"><i class="el-icon-message"></i>技工</template>
+                    <el-menu-item-group>
+                        <template slot="title">
+                            <el-menu-item index="/workers">技工</el-menu-item>
+                        </template>
+                    </el-menu-item-group>
+                </el-submenu>
+                <el-submenu index="6">
                     <template slot="title"><i class="el-icon-message"></i>设置</template>
                     <el-menu-item-group>
                         <template slot="title">

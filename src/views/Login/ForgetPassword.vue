@@ -1,7 +1,7 @@
 <template>
     <div class="login-bg">
         <div class="login-pos">
-            <img src="~@/assets/bg.png" alt="">
+            <img src="~@/assets/ld-bg.png" alt="">
             <div class="login-msg">
                 <el-form ref="forgetForm" :model="forgetForm" label-width="100px">
 

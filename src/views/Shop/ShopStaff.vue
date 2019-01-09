@@ -4,6 +4,7 @@
             <el-table
                     :data="staffData"
                     border
+                    :default-sort = "{prop: 'createTime'}"
                     style="width: 100%">
                 <el-table-column
                         prop="number"
@@ -36,15 +37,22 @@
                     </template>
                 </el-table-column>
             </el-table>
-            <el-pagination
+            <!--<el-pagination
                     @size-change="handleSizeChange"
                     @current-change="handleCurrentChange"
                     :current-page="staffPage"
-                    :page-sizes="[100, 200, 300, 400]"
+                    :page-sizes="[10, 200, 300, 400]"
                     :page-size="100"
                     layout="total, sizes, prev, pager, next, jumper"
                     :total="400">
-            </el-pagination>
+            </el-pagination>-->
+            <div class="page-btn">
+                <div>
+                    <el-button @click="lastPage">上一页</el-button>
+                    <el-button @click="nextPage">下一页</el-button>
+                    每页10条
+                </div>
+            </div>
             <el-button type="primary" @click="editStaff">添加管理员</el-button>
         </div>
         <staff-component v-else></staff-component>
@@ -52,32 +60,41 @@
 </template>
 
 <script>
+    import { timestampToString } from '../../http/common'
     import StaffComponent from '@/components/ShopStaff/StaffModify'
     export default {
         name: "ShopStaff",
         components: { StaffComponent },
         data () {
             return {
-                staffData: [
-                    {
-                        number: 1,
-                        account: '15101157662',
-                        name: '超级管理员',
-                        createTime: '2017/6/12',
-                        authority: '全部权限',
-                    },{
-                        number: 2,
-                        account: '15101157662',
-                        name: '隔壁老王',
-                        createTime: '2017/6/12',
-                        authority: '店铺管理、订单管理、资产管理、技工管理',
-                    }
-                ],
-                staffPage: 4,
+                staffData: [],
+                staffPage: 1,
                 staffState: 0
             }
         },
+        created() {
+            this.getListData(this.staffPage);
+        },
         methods: {
+            getListData(page) {
+                this.staffData = [];
+                let data = {
+                    "shopId": "5c27753e8ffaedc2a6bc4b71",
+                    "page": page,
+                };
+                this.$http.getAdminList(data).then((res) => {
+                    for(let listId in res){
+                        this.staffData.push({
+                            number: Number(listId) + 1,
+                            id: res[listId].id,
+                            account: res[listId].mobile,
+                            name: res[listId].name,
+                            createTime: timestampToString(res[listId].createTime),
+                            authority: res[listId].permissionList.join('、'),
+                        });
+                    }
+                });
+            },
             deleteAdmin(row) {
                 //console.log(row);
                 this.$confirm('确定要删除管理员?', {
@@ -98,12 +115,14 @@
             editStaff() {
                 this.staffState = 1;
             },
-            handleSizeChange(val) {
-                console.log(`每页 ${val} 条`);
+            lastPage() {
+                this.staffPage-=1;
+                this.getListData(this.staffPage);
             },
-            handleCurrentChange(val) {
-                console.log(`当前页: ${val}`);
-            }
+            nextPage() { //下一页
+                this.staffPage+=1;
+                this.getListData(this.staffPage);
+            },
         }
     }
 </script>
@@ -114,5 +133,10 @@
     }
     .el-button{
         margin-top: 20px;
+    }
+    .page-btn{
+        margin-right: 50px;
+        display: flex;
+        justify-content: flex-end;
     }
 </style>

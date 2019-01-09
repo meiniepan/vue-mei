@@ -4,12 +4,14 @@ import 'element-ui/lib/theme-chalk/index.css'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+import service from '@/http/service'
 
 Vue.use(ElementUI);
 
 import './style/base.css'
 import './style/index.scss'
 
+Vue.prototype.$http = service
 Vue.config.productionTip = false
 
 new Vue({

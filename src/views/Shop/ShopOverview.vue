@@ -2,7 +2,7 @@
     <div class="inner">
         <div class="shop-overview">
             <div class="merchant-overview">
-                <img src="~@/assets/logo.png" alt="">
+                <img src="~@/assets/ld-bg.png" alt="">
                 <div>
                     <h2>商家店铺名称</h2>
                     <span>创建店铺时间</span>
@@ -57,8 +57,8 @@
 
         <div class="download-app" v-if="downloadState === 1" @click="closePopup">
             <div class="popup-bg">
-                <p><img src="~@/assets/logo.png" alt="">Android下载</p>
-                <p><img src="~@/assets/logo.png" alt="">ios下载</p>
+                <p><img src="~@/assets/ld-logo.png" alt="">Android下载</p>
+                <p><img src="~@/assets/ld-logo.png" alt="">ios下载</p>
             </div>
         </div>
     </div>

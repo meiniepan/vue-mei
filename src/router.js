@@ -16,13 +16,27 @@ import ShopStaff from '@/views/Shop/ShopStaff'
 /*商品*/
 import Goods from '@/views/Goods/Goods'
 import GoodsAdd from '@/components/Goods/GoodsAdd'
+import GoodsModify from '@/components/Goods/GoodsModify'
+
 /*技工*/
 import Workers from '@/views/Workers/Workers'
 import AddWorker from '@/views/Workers/AddWorker'
 import EditWorker from '@/views/Workers/EditWorker'
 
+/*资产*/
+import IncomeOverview from '@/views/Asset/IncomeOverview'
+import OrderAccount from '@/views/Asset/OrderAccount'
+
+/*客户*/
+import Customer from '@/views/Customer/Customer'
+
 /*设置*/
 import Configuration from '@/views/Configuration/Configuration'
+
+// 订单
+import OrderList from '@/views/Order/OrderList'
+import OrderOverview from '@/views/Order/OrderOverview'
+import OrderDetail from '@/views/Order/OrderDetail'
 
 Vue.use(Router)
 
@@ -38,14 +52,6 @@ export default new Router({
       path: '/password',
       component: ForgetPassword
     },
-      {
-          path: '/addWorker',
-          component: AddWorker
-      },
-      {
-          path: '/editWorker',
-          component: EditWorker
-      },
     {
       path: '/overview',
       name: 'header',
@@ -69,21 +75,57 @@ export default new Router({
           },
           {
               path: '/goods',
-              component: Goods
+              component: Goods,
           },
           {
-              path: '/configuration',
-              component: Configuration
+              path: '/goodsAdd',
+              component: GoodsAdd
+          },
+          {
+              path: '/goodsModify',
+              component: GoodsModify
+          },
+          {
+              path: '/asset',
+              component: IncomeOverview
+          },
+          {
+              path: '/order',
+              component: OrderAccount
+          },
+          {
+              path:'/orderList',
+              component:OrderList
+          },
+          {
+              path:'/orderOverview',
+              component:OrderOverview
+          },
+          {
+              path:'orderDetail',
+              component:OrderDetail
+          },
+          {
+              path: '/customer',
+              component: Customer
           },
           {
               path: '/workers',
               component: Workers
+          },
+          {
+              path: '/addWorker',
+              component: AddWorker
+          },
+          {
+              path: '/editWorker',
+              component: EditWorker
+          },
+          {
+              path: '/configuration',
+              component: Configuration
           }
       ]
-    },
-    {
-      path: '/goodsAdd',
-      component: GoodsAdd
     },
     /*{
       path: '/about',
