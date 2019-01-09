@@ -5,7 +5,10 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import service from '@/http/service'
+import 'vue-area-linkage/dist/index.css';
+import VueAreaLinkage from 'vue-area-linkage';
 
+Vue.use(VueAreaLinkage)
 Vue.use(ElementUI);
 
 import './style/base.css'

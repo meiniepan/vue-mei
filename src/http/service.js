@@ -1,5 +1,6 @@
 import axios from "axios/index";
 import {BASE_URL} from "./index";
+import BIN from 'bankcardinfo'
 
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 axios.defaults.baseURL = BASE_URL;
@@ -104,7 +105,44 @@ const interfaceData = {
                     return res.data.rvalList
                 }
             })
-    }
+    },
+    /*获取银行开户信息*/
+    getBankMsg(bankAccount) {
+        return BIN.getBankBin(bankAccount)
+            .then(function (data) {
+                return data;
+            })
+            .catch(function (err) {
+                return err;
+            })
+    },
+    /*新增企业信息*/
+    addCorporation(corporateData) {
+        return axios.post('/corporation/add', corporateData)
+            .then((res) => {
+                if(res.data.status === 200){
+                    return res.data.status
+                }
+            })
+    },
+    /*创建店铺*/
+    addShop(shopMsg) {
+        return axios.post('/shop/create', shopMsg)
+            .then((res) => {
+                if(res.data.status === 200){
+                    return res.data;
+                }
+            })
+    },
+    /*获取店铺销量前10*/
+    /*getShopSalesVolume(shopId) {
+        return axios.post('/shop/order/get', shopId)
+            .then((res) => {
+                if(res.data.status === 200){
+                    return res.data.orderList
+                }
+            })
+    }*/
 };
 export default interfaceData;
 

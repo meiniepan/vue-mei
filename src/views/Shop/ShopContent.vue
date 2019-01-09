@@ -24,12 +24,11 @@
             <el-form-item label="店铺logo：" prop="logoUrl">
                 <el-upload
                         class="avatar-uploader"
-                        action="https://jsonplaceholder.typicode.com/posts/"
-                        accept="image/jpeg,image/gif,image/png"
+                        action="http://192.168.1.156:5000/files/add"
+                        accept="image/jpeg,image/gif,image/png,image/jpg"
                         :show-file-list="false"
-                        :on-success="handleAvatarSuccess"
-                        :before-upload="beforeAvatarUpload">
-                    <img v-if="shopForm.logoUrl" :src="shopForm.logoUrl" class="avatar">
+                        :on-success="logoSuccess">
+                    <img v-if="imgUrl" :src="imgUrl" class="avatar">
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
                 <span class="tips">建议尺寸120x120像素</span>
@@ -47,7 +46,7 @@
             </el-form-item>
 
             <el-form-item class="preserve-btn">
-                <el-button type="primary" @click="submitForm('shopForm')">编辑/保存</el-button>
+                <el-button type="primary" @click="shopMsg('shopForm')">编辑/保存</el-button>
             </el-form-item>
         </el-form>
     </div>
@@ -72,7 +71,7 @@
                         { required: true, message: '请输入店铺名称', trigger: 'blur' },
                         { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
                     ],
-                    bindPhone: [
+                    /*bindPhone: [
                         { required: true, message: '请输入手机号', trigger: 'blur' }
                     ],
                     category: [
@@ -80,39 +79,38 @@
                     ],
                     address: [
                         { required: true, message: '请填写所在地址', trigger: 'blur' }
-                    ],
+                    ],*/
                     logoUrl: [
                             { required: true, message: '请上传logo', trigger: 'change' }
                     ],
-                    shopState: [
+                    /*shopState: [
                         { required: true, message: '请选择店铺状态', trigger: 'change' }
                     ],
                     time: [
                         { required: true, message: '请填写注册时间', trigger: 'blur' }
-                    ]
-                }
+                    ]*/
+                },
+                imgUrl: '',
             };
         },
         methods: {
-            handleAvatarSuccess(res, file) {
-                this.shopForm.logoUrl = URL.createObjectURL(file.raw);
-            },
-            beforeAvatarUpload(file) {
-                const isJPG = file.type === 'image/jpeg';
-                const isLt2M = file.size / 1024 / 1024 < 2;
-
-                if (!isJPG) {
-                    this.$message.error('上传头像图片只能是 JPG 格式!');
+            logoSuccess(response, file) {
+                this.imgUrl = URL.createObjectURL(file.raw);
+                if(response.status === 200){
+                    this.shopForm.logoUrl = response.fileHash;
                 }
-                if (!isLt2M) {
-                    this.$message.error('上传头像图片大小不能超过 2MB!');
-                }
-                return isJPG && isLt2M;
             },
-            submitForm(formName) {
+            shopMsg(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        alert('submit!');
+                        let data = {
+                            name: this.shopForm.shopName,
+                            logo: this.shopForm.logoUrl,
+                            ownerId: '5c27199e3b7750be20ca44e0'
+                        };
+                        this.$http.addShop(data).then((res) => {
+                            this.$refs[formName].resetFields();
+                        })
                     } else {
                         alert('error submit!!');
                         return false;
