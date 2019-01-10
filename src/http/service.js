@@ -10,8 +10,8 @@ const interfaceData = {
     getClassify(classify) {
         return axios.post('/servicecategory/get',classify)
             .then((res) => {
-                if(res.data.status === 200){
-                    return res.data.cateList;
+                if(res.data.code === 200){
+                    return res.data.data.cateList;
                 }
             })
     },
@@ -19,18 +19,39 @@ const interfaceData = {
     addGoods(paramsdata) {
         return axios.post('/service/create', paramsdata)
             .then((res) => {
-                if(res.data.status === 200){
-                    return res.data;
+                console.log(res.data.code)
+                if(res.data.code === 200){
+                    return res.data.code;
+                }else{
+                    return res.data.code;
                 }
             });
 
+    },
+    /*编辑商品*/
+    modifyGoods(modifyData) {
+        return axios.post('/service/modify', modifyData)
+            .then((res) => {
+                if(res.data.code === 200){
+                    return res.data.code
+                }
+            })
+    },
+    /*获取商品详情*/
+    getGoodsDetail(detailData) {
+        return axios.post('/service/detail', detailData)
+            .then((res) => {
+                if(res.data.code === 200){
+                    return res.data.data
+                }
+            })
     },
     /*获取所有商品列表*/
     getGoods(shopData) {
         return axios.post('/service/get',shopData)
             .then((res) => {
-                if(res.data.status === 200){
-                    return res.data.serviceList;
+                if(res.data.code === 200){
+                    return res.data.data.serviceList;
                 }
             })
     },
@@ -38,8 +59,8 @@ const interfaceData = {
     goodsShelves(GoodsData) {
         return axios.post('/service/off',GoodsData)
             .then((res) => {
-                if(res.data.status === 200){
-                    return res.data.status;
+                if(res.data.code === 200){
+                    return res.data.code;
                 }
             })
     },
@@ -47,8 +68,8 @@ const interfaceData = {
     getMechanic(mechanicList) {
         return axios.post('/mechanic/get',mechanicList)
             .then((res) => {
-                if(res.data.status === 200){
-                    return res.data.mechanicSet;
+                if(res.data.code === 200){
+                    return res.data.data.mechanicSet;
                 }
             })
     },
@@ -56,8 +77,8 @@ const interfaceData = {
     getMechanicOrder(orderId) {
         return axios.post('/mechanic/order/get',orderId)
             .then((res) => {
-                if(res.data.status === 200){
-                    return res.data.orderList;
+                if(res.data.code === 200){
+                    return res.data.data.orderList;
                 }
             })
     },
@@ -65,8 +86,8 @@ const interfaceData = {
     addMechanic(mechanicData) {
         return axios.post('/mechanic/create', mechanicData)
             .then((res) => {
-                if(res.data.status === 200){
-                    return res.data;
+                if(res.data.code === 200){
+                    return res.data.code;
                 }
             });
     },
@@ -74,8 +95,8 @@ const interfaceData = {
     getTotalSales(salesData) {
         return axios.post('/shop/revenue/history', salesData)
             .then((res) => {
-                if(res.data.status === 200){
-                    return res.data.revenue;
+                if(res.data.code === 200){
+                    return res.data.data.revenue;
                 }
         })
     },
@@ -83,8 +104,8 @@ const interfaceData = {
     getAdminAuthority () {
         return axios.get('/permission/get')
             .then((res) => {
-                if(res.data.status === 200) {
-                    return res.data.permissionList
+                if(res.data.code === 200) {
+                    return res.data.data.permissionList
                 }
             })
     },
@@ -92,8 +113,8 @@ const interfaceData = {
     addShopAdmin(adminData) {
         return axios.post('/staff/add', adminData)
             .then((res) => {
-                if(res.data.status === 200){
-                    return res.data.status;
+                if(res.data.code === 200){
+                    return res.data.code;
                 }
             })
     },
@@ -101,8 +122,8 @@ const interfaceData = {
     getAdminList(shopId) {
         return axios.post('/shop/staff/get', shopId)
             .then((res) => {
-                if(res.data.status === 200) {
-                    return res.data.rvalList
+                if(res.data.code === 200) {
+                    return res.data.data.rvalList
                 }
             })
     },
@@ -120,8 +141,8 @@ const interfaceData = {
     addCorporation(corporateData) {
         return axios.post('/corporation/add', corporateData)
             .then((res) => {
-                if(res.data.status === 200){
-                    return res.data.status
+                if(res.data.code === 200){
+                    return res.data.code
                 }
             })
     },
@@ -129,8 +150,8 @@ const interfaceData = {
     addShop(shopMsg) {
         return axios.post('/shop/create', shopMsg)
             .then((res) => {
-                if(res.data.status === 200){
-                    return res.data;
+                if(res.data.code === 200){
+                    return res.data.code;
                 }
             })
     },
@@ -138,8 +159,8 @@ const interfaceData = {
     /*getShopSalesVolume(shopId) {
         return axios.post('/shop/order/get', shopId)
             .then((res) => {
-                if(res.data.status === 200){
-                    return res.data.orderList
+                if(res.data.code === 200){
+                    return res.data.data.orderList
                 }
             })
     }*/

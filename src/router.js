@@ -79,6 +79,7 @@ export default new Router({
           },
           {
               path: '/goodsAdd',
+              name: 'GoodsAdd',
               component: GoodsAdd
           },
           {

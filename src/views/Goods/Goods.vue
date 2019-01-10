@@ -57,7 +57,7 @@
                     show-overflow-tooltip>
                 <template slot-scope="scope">
                     <el-button @click="deleteGoods(scope.row)" type="text" size="small">删除</el-button>
-                    <el-button type="text" size="small" @click="releaseGoods(scope.row)">编辑</el-button>
+                    <el-button type="text" size="small" @click="editGoods(scope.row)">编辑</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -107,8 +107,18 @@
                     this.batchGoods.push(val[serviceId].serviceId);
                 }
             },
-            releaseGoods(row) { //发布或者编辑
-                this.$router.push('/goodsAdd')
+            releaseGoods() {
+                this.$router.push('/goodsAdd');
+            },
+            editGoods(row) { //发布或者编辑
+                //console.log(row.serviceId);
+                this.$router.push({
+                    name: 'GoodsAdd',
+                    path: '/goodsAdd',
+                    params: {
+                        serviceId: row.serviceId
+                    }
+                })
             },
             deleteGoods(row) { //删除
                 console.log(row);
@@ -155,7 +165,7 @@
             getGoodsData(page) {
                 this.goodsData = [];
                 let shopData = {
-                    "shopId": 12,
+                    "shopId": '5c36bb413b7750468fd79a03',
                     "page": page
                 };
                 this.$http.getGoods(shopData).then((res) => {
