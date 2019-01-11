@@ -43,6 +43,8 @@ const interfaceData = {
             .then((res) => {
                 if(res.data.code === 200){
                     return res.data.data
+                }else if(res.data.code === 203){
+                    return res.data.message
                 }
             })
     },
@@ -61,6 +63,15 @@ const interfaceData = {
             .then((res) => {
                 if(res.data.code === 200){
                     return res.data.code;
+                }
+            })
+    },
+    /*商品删除*/
+    goodsDelete(serviceId) {
+        return axios.post('/service/delete', serviceId)
+            .then((res) => {
+                if(res.data.code === 200){
+                    return res.data.code
                 }
             })
     },
@@ -90,6 +101,24 @@ const interfaceData = {
                     return res.data.code;
                 }
             });
+    },
+    /*编辑技工*/
+    modifyMechanic(mechanicId) {
+        return axios.post('/mechanic/modify', mechanicId)
+            .then((res) => {
+                if(res.data.code === 200){
+                    return res.data.code
+                }
+            })
+    },
+    /*删除技工*/
+    deleteMechanic(mechanicId) {
+        return axios.post('/shop/mechanic/remove', mechanicId)
+            .then((res) => {
+                if(res.data.code === 200){
+                    return res.data.code
+                }
+            })
     },
     /*资产总销售额*/
     getTotalSales(salesData) {
@@ -155,15 +184,23 @@ const interfaceData = {
                 }
             })
     },
-    /*获取店铺销量前10*/
-    /*getShopSalesVolume(shopId) {
+    /*获取店铺信息*/
+    getShopMsg(shopId) {
+        return axios.post('/shop/detail', shopId).then((res) => {
+            if(res.data.code){
+                return res.data.data
+            }
+        })
+    },
+    /*获取店铺服务销量前10*/
+    getShopSalesVolume(shopId) {
         return axios.post('/shop/order/get', shopId)
             .then((res) => {
                 if(res.data.code === 200){
                     return res.data.data.orderList
                 }
             })
-    }*/
+    }
 };
 export default interfaceData;
 

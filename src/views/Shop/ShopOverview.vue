@@ -2,10 +2,10 @@
     <div class="inner">
         <div class="shop-overview">
             <div class="merchant-overview">
-                <img src="~@/assets/ld-bg.png" alt="">
+                <img :src="shopMsg.logo" alt="">
                 <div>
-                    <h2>商家店铺名称</h2>
-                    <span>创建店铺时间</span>
+                    <h2>{{shopMsg.name}}</h2>
+                    <span>{{shopMsg.createTime}}</span>
                 </div>
             </div>
             <div>
@@ -66,11 +66,13 @@
 
 <script>
     import DisplayComponent from './ShopOverview/Display'
+    import { timestampToString } from '../../http/common'
     export default {
         name: "ShopOverview",
         components: { DisplayComponent },
         data() {
             return {
+                shopMsg: {},
                 statisticsTable: [
                     {
                         number: '1',
@@ -89,6 +91,30 @@
                 ],
                 downloadState: 0,
             }
+        },
+        created () {
+            let data = {
+                "shopId": "5c36be373b77504787b2e7e4"
+            };
+            this.$http.getShopMsg(data).then((res) => {
+                this.shopMsg = {
+                  name: res.name,
+                  logo: 'http://192.168.1.186:8081/ipfs/' + res.logo,
+                  createTime: timestampToString(res.createTime)
+                };
+            });
+            this.$http.getShopSalesVolume(data).then((res) => {
+                console.log(res);
+                for(let goodsId in res){
+                    console.log(res[goodsId]);
+                    let orderId = {
+                        serviceId: res[goodsId]
+                    };
+                    this.$http.getGoodsDetail(orderId).then((res) => {
+                        console.log(res)
+                    })
+                }
+            })
         },
         methods: {
             goodsAdd() {

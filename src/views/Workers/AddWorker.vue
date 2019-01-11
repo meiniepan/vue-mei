@@ -7,7 +7,7 @@
             <el-input v-model="mechanicForm.mobile" placeholder="请填写技工手机号"></el-input>
         </el-form-item>
         <el-form-item label="技工状态">
-            <el-select v-model.number="mechanicForm.status" placeholder="请选择技工状态">
+            <el-select v-model="mechanicForm.status" placeholder="请选择技工状态">
                 <el-option label="正常" value="1"></el-option>
                 <el-option label="停用" value="0"></el-option>
             </el-select>
@@ -30,14 +30,25 @@
                     mobile: '',
                     status: '',
                     tag: '',
-                    shopId: '001'
                 }
             }
         },
         methods: {
             addMechanic() {
-                this.$http.addMechanic(this.mechanicForm).then(() => {
-                    this.$router.push('/workers');
+                let data = {
+                    name: this.mechanicForm.name,
+                    mobile: this.mechanicForm.mobile,
+                    status: Number(this.mechanicForm.status),
+                    tag: this.mechanicForm.tag,
+                    shopId: '5c36bb413b7750468fd79a03'
+                };
+                this.$http.addMechanic(data).then(() => {
+                    this.$alert('创建成功', '', {
+                        cancelButtonText: '确定',
+                        callback: () => {
+                            this.$router.push('/workers');
+                        }
+                    });
                 });
             },
             cancelMechanic() {

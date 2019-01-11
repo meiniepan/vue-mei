@@ -222,7 +222,7 @@
                 if(oldData){this.$set(this.modifyData, 'inventory', newData);}
             },
             'goodsForm.orderForm': function (newData) { //服务方式
-                this.$set(this.modifyData, 'type', Number(newData));console.log(this.modifyData)
+                this.$set(this.modifyData, 'type', Number(newData));
             },
             'goodsForm.orderCost': function(newData, oldData) { //上门费
                 if(oldData){this.$set(this.modifyData, 'underline', newData);}
@@ -239,7 +239,7 @@
                 this.classifyList = res;
             });
             if(!this.$route.params.serviceId){ //新建
-                return;
+                console.log('新建')
             }else{ //编辑
                 this.serviceId = this.$route.params.serviceId;
                 //this.serviceId = '5c36bc993b7750468fd79a05';
@@ -265,7 +265,7 @@
                             advert: res.price,
                             classify: res.tag,
                             addSpec: specArr,
-                            spec: res.specification.length > 1 ? '1' : '0',
+                            spec: res.specification.length > 0 ? '1' : '0',
                             totalInventory: res.inventory,
                             orderForm: res.type.toString(),
                             orderCost: res.underline,
@@ -353,11 +353,11 @@
                 for(let item in this.goodsForm.addSpec){
                     specArr.push(JSON.stringify(this.goodsForm.addSpec[item]));
                 }
-                if(this.serviceId !== undefined){
+                if(this.serviceId !== ''){
                     this.$set(this.modifyData, 'specification', specArr);
-                    //console.log(this.modifyData);
                     this.$http.modifyGoods(this.modifyData).then((res) => {
                         console.log(res);
+                        this.$router.push('/goods');
                     })
                 }else{
                     /*广告语*/
@@ -376,7 +376,6 @@
                         "underline": this.goodsForm.orderCost, //上门费用
                         "content": this.goodsForm.tinymceHtml, //详情
                     };
-                    console.log(data);
                     this.$http.addGoods(data).then((res) => {
                         if(res.code === 200){
                             this.$router.push('/goods');

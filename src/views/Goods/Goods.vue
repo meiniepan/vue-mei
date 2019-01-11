@@ -56,7 +56,7 @@
                     label="操作"
                     show-overflow-tooltip>
                 <template slot-scope="scope">
-                    <el-button @click="deleteGoods(scope.row)" type="text" size="small">删除</el-button>
+                    <el-button @click="deleteGoods(scope.row.serviceId, 1)" type="text" size="small">删除</el-button>
                     <el-button type="text" size="small" @click="editGoods(scope.row)">编辑</el-button>
                 </template>
             </el-table-column>
@@ -64,7 +64,7 @@
         <div class="goods-btn">
             <div>
                 <el-button @click="goodsShelves">下架</el-button>
-                <el-button>删除</el-button>
+                <el-button @click="deleteGoods(0,2)">删除</el-button>
             </div>
             <div>
                 <el-button @click="lastPage">上一页</el-button>
@@ -120,16 +120,24 @@
                     }
                 })
             },
-            deleteGoods(row) { //删除
-                console.log(row);
+            deleteGoods(row,index) { //删除
+                let data = {};
                 this.$confirm('确定要删除商品?', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                 }).then(() => {
-                    this.$message({
-                        type: 'success',
-                        message: '删除成功!'
-                    });
+                    if(index === 1){
+                        data = {serviceIdList: [row]};
+                    }else{
+                        data = {serviceIdList: this.batchGoods}
+                    }
+                    this.$http.goodsDelete(data)
+                        .then((res) => {
+                            this.$message({
+                                type: 'success',
+                                message: '删除成功!'
+                            });
+                        });
                 }).catch(() => {
                     this.$message({
                         type: 'info',
