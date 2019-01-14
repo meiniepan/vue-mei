@@ -53,64 +53,90 @@
             <el-table-column prop="method" label="支付方式" width="180" align="center">
             </el-table-column>
         </el-table>
-        <el-pagination
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            :page-size="100"
-            layout="total, prev, pager, next"
-            :total="1000">
-        </el-pagination>
+        <div class="page-btn">
+            <div>
+                <el-button @click="lastPage">上一页</el-button>
+                <el-button @click="nextPage">下一页</el-button>
+                每页10条
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
+import { timestampToString } from '../../http/common'
 export default {
     name: "Customer",
     data() {
         return {
-            tableData: [{
-                index: '01',
-                account: '13688330098',
-                name: '张三',
-                address: '上海市普陀区金沙江路 1518 弄',
-                phone: '1800135526',
-                order_num: 'E1234656789090',
-                date: '2016.6.8 15:45:48',
-                amount: '89.00',
-                method: '微信支付'
-            }, {
-                index: '02',
-                account: '13688330000',
-                name: '李四',
-                address: '上海市普陀区金沙江路 1520 弄',
-                phone: '1800135527',
-                order_num: 'E1234656789099',
-                date: '2016.6.9 15:45:48',
-                amount: '101.00',
-                method: '支付宝支付'
-            }
-            ],
+            tableData: [],
             formData: {
                 account: '',
                 order_num: '',
                 region: '',
                 name: '',
                 method: ''
-            }
+            },
+            staffPage: 1,
         }
     },
+    created() {
+        this.getListData(1);
+    },
     methods: {
-        handleSizeChange(val) {
-            console.log(`每页 ${val} 条`);
-        },
-        handleCurrentChange(val) {
-            console.log(`当前页: ${val}`);
+        getListData(direction) {
+            let baseId = "0";
+            let dataLen = this.tableData.length;
+
+            if (dataLen !== 0) {
+                if (direction === 1) {
+                    baseId = this.tableData[dataLen - 1].id;
+                } else {
+                    baseId = this.tableData[0].id;
+                }
+            }
+            // console.log('===>' + baseId);
+            let data = {
+                "shopId": "5c3835383b775072a06a5329",
+                "direction": direction,
+                "baseObjectId": baseId
+            };
+            this.$http.getCustomerList(data).then((res) => {
+                if (res == '') {
+                    console.log('return');
+                } else {
+                    this.tableData = [];
+                    for(let listId in res){
+                        let item = res[listId];
+                        // console.log('---->' + item.id);
+                        this.tableData.push({
+                            index: Number(listId) + 1,
+                            account: item.account,
+                            name: item.name,
+                            address: item.address,
+                            phone: item.mobile,
+                            order_num: item.serial,
+                            date: timestampToString(item.createTime),
+                            amount: item.amount,
+                            method: (item.payType === 0) ? '微信支付' : '支付宝支付',
+                            id: item.id
+                        });
+                    }
+                }
+            });
         },
         onSubmit() {
             console.log(this.formData);
         },
         handleOrderNumClick(order_num) {
             console.log(order_num);
+            this.$router.push('../Order/OrderDetail');
+        },
+        lastPage() {
+            this.getListData(0);
+        },
+        nextPage() { //下一页
+            this.getListData(1);
         }
     }
 }
@@ -121,5 +147,10 @@ export default {
         position: fixed;
         bottom: 100px;
         right: 50px;
+    }
+    .page-btn{
+        margin-right: 50px;
+        display: flex;
+        justify-content: flex-end;
     }
 </style>

@@ -200,7 +200,15 @@ const interfaceData = {
                     return res.data.data.orderList
                 }
             })
+    },
+    /*获取客户列表*/
+    getCustomerList(requestData) {
+        return axios.post('/shop/customer/get', requestData)
+            .then((res) => {
+                if(res.data.code === 200) {
+                    return res.data.data.customerIdList;
+                }
+            })
     }
 };
 export default interfaceData;
-
