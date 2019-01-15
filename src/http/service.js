@@ -19,14 +19,12 @@ const interfaceData = {
     addGoods(paramsdata) {
         return axios.post('/service/create', paramsdata)
             .then((res) => {
-                console.log(res.data.code)
                 if(res.data.code === 200){
                     return res.data.code;
                 }else{
                     return res.data.code;
                 }
             });
-
     },
     /*编辑商品*/
     modifyGoods(modifyData) {
@@ -77,19 +75,10 @@ const interfaceData = {
     },
     /*获取所有技工列表*/
     getMechanic(mechanicList) {
-        return axios.post('/mechanic/get',mechanicList)
+        return axios.post('/shop/mechanic/get',mechanicList)
             .then((res) => {
                 if(res.data.code === 200){
                     return res.data.data.mechanicSet;
-                }
-            })
-    },
-    /*获取技工信息*/
-    getMechanicOrder(orderId) {
-        return axios.post('/mechanic/order/get',orderId)
-            .then((res) => {
-                if(res.data.code === 200){
-                    return res.data.data.orderList;
                 }
             })
     },
@@ -127,7 +116,7 @@ const interfaceData = {
                 if(res.data.code === 200){
                     return res.data.data.revenue;
                 }
-        })
+            })
     },
     /*获取权限列表接口*/
     getAdminAuthority () {
@@ -153,6 +142,24 @@ const interfaceData = {
             .then((res) => {
                 if(res.data.code === 200) {
                     return res.data.data.rvalList
+                }
+            })
+    },
+    /*编辑管理员*/
+    modifyStaff(staffId) {
+        return axios.post('/shop/staff/modify', staffId)
+            .then((res) => {
+                if(res.data.code === 200){
+                    return res.data.code
+                }
+            })
+    },
+    /*删除管理员*/
+    deleteStaff(staffId) {
+        return axios.post('/shop/staff/delete', staffId)
+            .then((res) => {
+                if(res.data.code === 200){
+                    return res.data.code
                 }
             })
     },

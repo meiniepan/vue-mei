@@ -83,23 +83,20 @@
             return {
                 goodsData: [],
                 batchGoods: [],
-                page: 1,
             }
         },
         created() {
-            this.getGoodsData(this.page);
+            this.getGoodsData(1);
         },
         methods: {
             filterTag(value, row) {
                 return row.state === value;
             },
             lastPage() {
-                this.page-=1;
-                this.getGoodsData(this.page);
+                this.getGoodsData(0);
             },
             nextPage() { //下一页
-                this.page+=1;
-                this.getGoodsData(this.page);
+                this.getGoodsData(1);
             },
             batchSelectionGoods(val) {
                 this.batchGoods = [];
@@ -111,7 +108,6 @@
                 this.$router.push('/goodsAdd');
             },
             editGoods(row) { //发布或者编辑
-                //console.log(row.serviceId);
                 this.$router.push({
                     name: 'GoodsAdd',
                     path: '/goodsAdd',
@@ -133,6 +129,8 @@
                     }
                     this.$http.goodsDelete(data)
                         .then((res) => {
+                            this.goodsData = [];
+                            this.getGoodsData(1);
                             this.$message({
                                 type: 'success',
                                 message: '删除成功!'
@@ -160,6 +158,7 @@
                             type: 'success',
                             message: '下架成功!'
                         });
+                        this.goodsData = [];
                         this.getGoodsData(1);
                     });
                 }).catch(() => {
@@ -170,24 +169,40 @@
                 });
             },
             /*获取所有商品*/
-            getGoodsData(page) {
-                this.goodsData = [];
+            getGoodsData(direction) {
+                let baseData = '111';
+                if(this.goodsData.length !== 0){
+                    if(direction === 1){
+                        baseData = this.goodsData[this.goodsData.length-1].serviceId;
+                    }else{
+                        baseData = this.goodsData[0].serviceId;
+                    }
+                };
                 let shopData = {
                     "shopId": '5c36bb413b7750468fd79a03',
-                    "page": page
+                    "baseObjectId": baseData,
+                    "direction": direction
                 };
                 this.$http.getGoods(shopData).then((res) => {
-                    for(let item in res){
-                        this.goodsData.push({
-                            title: res[item].name,
-                            price: '¥'+res[item].price,
-                            stock: res[item].inventory,
-                            sales: res[item].sales,
-                            createTime: timestampToString(res[item].createTime),
-                            classify: res[item].tag,
-                            state: res[item].status,
-                            serviceId: res[item].serviceId
+                    if(res.length === 0){
+                        this.$alert('没有更多数据', '', {
+                            cancelButtonText: '确定'
                         });
+                        return;
+                    }else {
+                        this.goodsData = [];
+                        for(let item in res){
+                            this.goodsData.push({
+                                title: res[item].name,
+                                price: '¥'+res[item].price,
+                                stock: res[item].inventory,
+                                sales: res[item].sales,
+                                createTime: timestampToString(res[item].createTime),
+                                classify: res[item].tag,
+                                state: res[item].status,
+                                serviceId: res[item].serviceId
+                            });
+                        }
                     }
                 })
             }

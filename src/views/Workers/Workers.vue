@@ -4,7 +4,6 @@
         <el-table
                 :data="mechanicData"
                 border
-                :default-sort = "{prop: 'num', order: 'descending'}"
                 highlight-current-row
                 @current-change="getMechanicId"
                 style="width: 100%">
@@ -34,7 +33,7 @@
                 </template>
             </el-table-column>
             <el-table-column
-                    prop="quantity"
+                    prop="orders"
                     label="已服务订单数量">
             </el-table-column>
             <el-table-column
@@ -56,10 +55,18 @@
                     width="100">
                 <template slot-scope="scope">
                     <el-button @click="saveModify(scope.row)" type="text" size="small">确定</el-button>
-                    <el-button @click="deleteModify(scope.$index, mechanicData,scope.row)" type="text" size="small">删除</el-button>
+                    <el-button @click="deleteModify(scope.row)" type="text" size="small">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
+
+        <div class="page-btn">
+            <div>
+                <el-button @click="lastPage">上一页</el-button>
+                <el-button @click="nextPage">下一页</el-button>
+                每页10条
+            </div>
+        </div>
     </div>
 </template>
 
@@ -68,8 +75,15 @@
     import { timestampToString } from '../../http/common'
     export default {
         components: {ElContainer},
+        data() {
+            return {
+                mechanicData: [],
+                modifyMechanic: {},
+                mechanicId: '',
+            }
+        },
         created() {
-            this.getMechanicList();
+            this.getMechanicList(1);
         },
         methods: {
             getMechanicId(currentRow) { //获取技工id
@@ -85,7 +99,9 @@
             statusModify(row) {
                 this.changeModify(row.mechanicId, 'status', Number(row.status));
             },
+            /*保存编辑*/
             saveModify (row) {
+                console.log(this.modifyMechanic);
                 if(this.modifyMechanic.name !== undefined || this.modifyMechanic.mobile !== undefined || this.modifyMechanic.status !== undefined){
                     if(this.mechanicId === row.mechanicId){
                         this.$set(this.modifyMechanic, 'mechanicId', row.mechanicId);
@@ -99,24 +115,23 @@
                     console.log('失败');
                 }
             },
-            deleteModify(index, rows, list) {
-                console.log(list);
+            deleteModify(list) {
                 this.$confirm('确定要删除技工吗?', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                 }).then(() => {
                     let deleteData = {
-                        shopId: '5c36bb413b7750468fd79a03',
+                        shopId: '5c3835383b775072a06a5329',
                         mechanicId: list.mechanicId
                     };
                     this.$http.deleteMechanic(deleteData)
                         .then((res) => {
-                            console.log(res);
+                            this.mechanicData = [];
+                            this.getMechanicList(1);
                             this.$message({
                                 type: 'success',
                                 message: '删除成功!'
                             });
-                            rows.splice(index, 1);
                         });
                 }).catch(() => {
                     this.$message({
@@ -128,6 +143,12 @@
             addWorker() {
                 this.$router.push('/addWorker');
             },
+            lastPage() {
+                this.getMechanicList(0);
+            },
+            nextPage() {
+                this.getMechanicList(1);
+            },
             changeModify(mechanicId,fieldName, fieldval) {
                 if(this.mechanicId === mechanicId){
                     this.$set(this.modifyMechanic, fieldName, fieldval);
@@ -135,40 +156,53 @@
                     this.modifyMechanic = {};
                 }
             },
-            getMechanicList () {
-                this.mechanicData = [];
+            getMechanicList (direction) {
+                let baseData = '111';
+                if(this.mechanicData.length !== 0){
+                    if(direction === 1){
+                        baseData = this.mechanicData[this.mechanicData.length-1].mechanicId;
+                    }else{
+                        baseData = this.mechanicData[0].mechanicId;
+                    }
+                }
                 let listData = {
-                    shopId: '5c36bb413b7750468fd79a03',
+                    shopId: '5c3835383b775072a06a5329',
+                    "direction": direction,
+                    "baseObjectId": baseData,
+                    "statusList": [0,1],
                 };
                 this.$http.getMechanic(listData).then((res) => {
-                    for(let mechanic in res) {
-                        let time = res[mechanic].createTime.split('.')[0];
-                        let orderId = {
-                            "mechanicId": res[mechanic].id
-                        };
-                        this.$http.getMechanicOrder(orderId).then((resp) => {
+                    if(res.length === 0){
+                        this.$alert('没有更多数据', '', {
+                            cancelButtonText: '确定'
+                        });
+                        return;
+                    }else {
+                        this.mechanicData = [];
+                        for(let mechanic in res) {
+                            let val = res[mechanic];
+                            let time = val.createTime.split('.')[0];
                             this.mechanicData.push({
-                                mechanicId: res[mechanic].id,
+                                mechanicId: val.id,
                                 num: Number(mechanic) + 1,
                                 date: timestampToString(time),
-                                phone: res[mechanic].mobile,
-                                name: res[mechanic].name,
-                                quantity: resp.length,
-                                money: res[mechanic].ordersAmount,
-                                status: res[mechanic].status === 1 ? '正常' : '停用'
+                                phone: val.mobile,
+                                name: val.name,
+                                orders: val.orders,
+                                money: val.ordersAmount,
+                                status: val.status === 1 ? '正常' : '停用'
                             })
-                        });
+                        }
                     }
                 });
             },
         },
-
-        data() {
-            return {
-                mechanicData: [],
-                modifyMechanic: {},
-                mechanicId: '',
-            }
-        }
     }
 </script>
+<style scoped lang="scss">
+    .page-btn{
+        margin-right: 50px;
+        display: flex;
+        justify-content: flex-end;
+    }
+</style>
