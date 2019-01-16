@@ -15,7 +15,8 @@
         <div class="order-detail-serve">
             <el-table
                     ref="orderDetailTable"
-                    :data="tableData"
+                    :data="orderDetailTable"
+                    border
                     style="width: 100%">
                 <el-table-column
                         prop="price"
@@ -23,7 +24,7 @@
                         width="250px">
                     <template slot-scope="scope">
                         <img style="float: left;margin-right: 10px" alt="" width="80" height="80"
-                             :src="scope.row.picture"/>
+                             :src="scope.row.images"/>
                         <div>
                             <p class="order-detail-serve-name">{{ scope.row.name }}</p>
                             <p style="margin-top: 30px">{{ scope.row.tag }}</p>
@@ -33,30 +34,26 @@
                 <el-table-column
                         prop="price"
                         label="价格"
-                        width="180"
                         align="center">
                 </el-table-column>
                 <el-table-column
-                        prop="name"
+                        prop="amount"
                         label="数量"
-                        width="180"
                         align="center">
                 </el-table-column>
                 <el-table-column
-                        prop="price"
+                        prop="amount"
                         label="小计（元）"
-                        width="180"
                         align="center">
                 </el-table-column>
                 <el-table-column
-                        prop="address"
+                        prop="status"
                         label="状态"
                         align="center">
                 </el-table-column>
                 <el-table-column
-                        prop="address"
+                        prop="underline"
                         label="上门费（元）"
-                        :formatter="formatterPrice"
                         align="center">
                 </el-table-column>
 
@@ -66,9 +63,11 @@
 
         <div class="order-detail-info">
             <div class="order-detail-title">订单信息</div>
-            <div class="order-item">订单编号：<span>{{orderId}}</span></div>
+            <div class="order-item">订单编号：<span>{{orderDetailTable[0].serial}}</span></div>
             <div class="order-item">服务方式：<span>站点服务</span></div>
-            <div class="order-item">服务站点： <span>新科祥园来到社区家综服务中心</span></div>
+            <div class="order-item">收货人：<span>{{orderDetailTable[0].contact}}</span></div>
+            <div class="order-item">收货电话：<span>{{orderDetailTable[0].mobile}}</span></div>
+            <div class="order-item">收货地址： <span>{{orderDetailTable[0].address}}</span></div>
             <div class="order-item">买家留言： <span>无</span></div>
         </div>
 
@@ -76,9 +75,12 @@
             <div class="order-detail-title">支付信息</div>
             <div class="order-item">支付流水：<span>2016060232113121313121313131313131</span></div>
             <div class="order-item">费用类型：<span>首次支付</span></div>
-            <div class="order-item">支付方式： <span>支付宝扫码付</span></div>
+            <div class="order-item">支付方式： <span>{{orderDetailTable[0].payType}}</span></div>
             <div class="order-item">支付时间： <span>2018-11-17 16:00-18:00</span></div>
         </div>
+
+        <el-button @click="goBack">返回</el-button>
+        <el-button>分单</el-button>
     </div>
 
 </template>
@@ -89,46 +91,45 @@
 
         data() {
             return {
-                status: '2',
+                status: 2,
                 paid: true,
                 orderId:'',
-                tableData: [{
-                    id: '1231232132131',
-                    date: '2016-05-02',
-                    picture: 'http://img1.gtimg.com/cd/pics/hv1/180/129/2246/146079225.jpg',
-                    name: '通下水道家属楼打卡机打算看来大家看了神界大陆可视对讲卡拉时间段来看',
-                    address: '不知道是啥',
-                    price: '12.01',
-                    tag: '红色'
-                }, {
-                    id: '1231232132131',
-                    date: '2016-05-04',
-                    picture: 'http://img.zcool.cn/community/01e57756fdee9d6ac7257948a00cf9.jpg@1280w_1l_2o_100sh.jpg',
-                    name: '水管',
-                    address: '不知道是啥',
-                    price: '12.01',
-                    tag: '红色'
-                }, {
-                    id: '1231232132131',
-                    date: '2016-05-01',
-                    picture: 'https://img.alicdn.com/tfs/TB1H95ddBfH8KJjy1XbXXbLdXXa-350-350.jpg',
-                    name: '暖气片',
-                    address: '不知道是啥',
-                    price: '12.01',
-                    tag: '绿色'
-                }]
+                orderDetailTable: []
             }
         },
 
         mounted(){
-            this.orderId = this.$route.query.orderId;
+            this.orderId = this.$route.params.id;
+            //console.log(this.orderId);
             this.getOrderDetail();
-
         },
 
         methods: {
             getOrderDetail() {
+                let data = {
+                    "shopId": "5c3835383b775072a06a5329",
+                    "orderImplId": '5c3e81913b77506ae0a98ea4'
+                };
+                this.$http.getOrderDetail(data).then((res) => {
+                    //console.log(res);
+                    this.orderDetailTable.push({
+                        images: res.orderImplInfo.images,
+                        amount: res.orderImplInfo.amount,
+                        name: res.orderImplInfo.name,
+                        price: res.orderImplInfo.price,
+                        status: res.orderImplInfo.status,
+                        underline: res.orderImplInfo.underline,
 
+                        address: res.orderInfo.address,
+                        contact: res.orderInfo.contact,
+                        mobile: res.orderInfo.mobile,
+                        payType: res.orderInfo.payType,
+                        serial: res.orderInfo.serial
+                    })
+                })
+            },
+            goBack() {
+                this.$router.back(-1);
             }
         }
     }
@@ -165,13 +166,11 @@
         padding: 10px;
     }
     .order-detail-serve-name{
-        width:120px;
         overflow:hidden;
         text-overflow:ellipsis;
         display:-webkit-box;
         -webkit-box-orient:vertical;
         -webkit-line-clamp:2;
-        line-height: 20px;
-        height: 40px;
+        line-height: 80px;
     }
 </style>

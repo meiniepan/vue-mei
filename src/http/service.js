@@ -1,4 +1,5 @@
 import axios from "axios/index";
+import { Message } from 'element-ui'
 import {BASE_URL} from "./index";
 import BIN from 'bankcardinfo'
 
@@ -12,6 +13,8 @@ const interfaceData = {
             .then((res) => {
                 if(res.data.code === 200){
                     return res.data.data.cateList;
+                }else{
+                    return Message.error(res.data.message);
                 }
             })
     },
@@ -22,7 +25,7 @@ const interfaceData = {
                 if(res.data.code === 200){
                     return res.data.code;
                 }else{
-                    return res.data.code;
+                    return Message.error(res.data.message);
                 }
             });
     },
@@ -32,6 +35,8 @@ const interfaceData = {
             .then((res) => {
                 if(res.data.code === 200){
                     return res.data.code
+                }else{
+                    return Message.error(res.data.message);
                 }
             })
     },
@@ -41,8 +46,8 @@ const interfaceData = {
             .then((res) => {
                 if(res.data.code === 200){
                     return res.data.data
-                }else if(res.data.code === 203){
-                    return res.data.message
+                }else{
+                    return Message.error(res.data.message);
                 }
             })
     },
@@ -52,6 +57,8 @@ const interfaceData = {
             .then((res) => {
                 if(res.data.code === 200){
                     return res.data.data.serviceList;
+                }else{
+                    return Message.error(res.data.message);
                 }
             })
     },
@@ -61,6 +68,8 @@ const interfaceData = {
             .then((res) => {
                 if(res.data.code === 200){
                     return res.data.code;
+                }else{
+                    return Message.error(res.data.message);
                 }
             })
     },
@@ -70,6 +79,8 @@ const interfaceData = {
             .then((res) => {
                 if(res.data.code === 200){
                     return res.data.code
+                }else{
+                    return Message.error(res.data.message);
                 }
             })
     },
@@ -79,6 +90,8 @@ const interfaceData = {
             .then((res) => {
                 if(res.data.code === 200){
                     return res.data.data.mechanicSet;
+                }else{
+                    return Message.error(res.data.message);
                 }
             })
     },
@@ -88,6 +101,8 @@ const interfaceData = {
             .then((res) => {
                 if(res.data.code === 200){
                     return res.data.code;
+                }else{
+                    return Message.error(res.data.message);
                 }
             });
     },
@@ -97,6 +112,8 @@ const interfaceData = {
             .then((res) => {
                 if(res.data.code === 200){
                     return res.data.code
+                }else{
+                    return Message.error(res.data.message);
                 }
             })
     },
@@ -106,6 +123,8 @@ const interfaceData = {
             .then((res) => {
                 if(res.data.code === 200){
                     return res.data.code
+                }else{
+                    return Message.error(res.data.message);
                 }
             })
     },
@@ -115,6 +134,8 @@ const interfaceData = {
             .then((res) => {
                 if(res.data.code === 200){
                     return res.data.data.revenue;
+                }else{
+                    return Message.error(res.data.message);
                 }
             })
     },
@@ -124,6 +145,8 @@ const interfaceData = {
             .then((res) => {
                 if(res.data.code === 200) {
                     return res.data.data.permissionList
+                }else{
+                    return Message.error(res.data.message);
                 }
             })
     },
@@ -133,6 +156,8 @@ const interfaceData = {
             .then((res) => {
                 if(res.data.code === 200){
                     return res.data.code;
+                }else{
+                    return Message.error(res.data.message);
                 }
             })
     },
@@ -142,6 +167,8 @@ const interfaceData = {
             .then((res) => {
                 if(res.data.code === 200) {
                     return res.data.data.rvalList
+                }else{
+                    return Message.error(res.data.message);
                 }
             })
     },
@@ -151,6 +178,8 @@ const interfaceData = {
             .then((res) => {
                 if(res.data.code === 200){
                     return res.data.code
+                }else{
+                    return Message.error(res.data.message);
                 }
             })
     },
@@ -160,6 +189,8 @@ const interfaceData = {
             .then((res) => {
                 if(res.data.code === 200){
                     return res.data.code
+                }else{
+                    return Message.error(res.data.message);
                 }
             })
     },
@@ -179,6 +210,8 @@ const interfaceData = {
             .then((res) => {
                 if(res.data.code === 200){
                     return res.data.code
+                }else{
+                    return Message.error(res.data.message);
                 }
             })
     },
@@ -188,6 +221,8 @@ const interfaceData = {
             .then((res) => {
                 if(res.data.code === 200){
                     return res.data.code;
+                }else{
+                    return Message.error(res.data.message);
                 }
             })
     },
@@ -196,6 +231,8 @@ const interfaceData = {
         return axios.post('/shop/detail', shopId).then((res) => {
             if(res.data.code){
                 return res.data.data
+            }else{
+                return Message.error(res.data.message);
             }
         })
     },
@@ -205,6 +242,8 @@ const interfaceData = {
             .then((res) => {
                 if(res.data.code === 200){
                     return res.data.data.orderList
+                }else{
+                    return Message.error(res.data.message);
                 }
             })
     },
@@ -214,8 +253,54 @@ const interfaceData = {
             .then((res) => {
                 if(res.data.code === 200) {
                     return res.data.data.customerIdList;
+                }else{
+                    return Message.error(res.data.message);
                 }
             })
-    }
+    },
+    /*获取所有订单*/
+    getOrderList(shopId) {
+        return axios.post('/shop/order/get', shopId)
+            .then((res) => {
+                if(res.data.code === 200){
+                    return res.data.data.orderList
+                }else{
+                    return Message.error(res.data.message);
+                }
+            });
+    },
+    /*获取订单详情*/
+    getOrderDetail(orderId) {
+        return axios.post('/orderimpl/detail', orderId)
+            .then((res) => {
+                if(res.data.code === 200){
+                    return res.data.data
+                }else{
+                    return Message.error(res.data.message);
+                }
+            })
+    },
+    /*登录*/
+    login(idData) {
+        return axios.post('/merchant/login', idData)
+            .then((res) => {
+                if(res.data.code === 200){
+                    return res.data.code
+                }else{
+                    return Message.error(res.data.message);
+                }
+            })
+    },
+    /*注册*/
+    merchantCreate(createData) {
+        return axios.post('/merchant/create', createData)
+            .then((res) => {
+                if(res.data.code === 200){
+                    return res.data.code;
+                }else{
+                    return Message.error(res.data.message);
+                }
+            })
+    },
 };
 export default interfaceData;

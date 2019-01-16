@@ -103,7 +103,8 @@ export default new Router({
               component:OrderOverview
           },
           {
-              path:'orderDetail',
+              path:'/orderDetail',
+              name: 'OrderList',
               component:OrderDetail
           },
           {
