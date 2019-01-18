@@ -3,17 +3,43 @@
         <div class="login-pos">
             <img src="~@/assets/ld-bg.png" alt="">
             <div class="login-msg">
-                <el-form ref="forgetForm" :model="forgetForm" label-width="100px">
+                <el-form ref="forgetForm"
+                         status-icon
+                         :rules="forgetRules"
+                         :model="forgetForm" v-if="getStatus === 0">
 
-                    <el-form-item label="商家账号：">
-                        <el-input v-model="forgetForm.merchantAccount"></el-input>
+                    <el-form-item label="" prop="merchantAccount">
+                        <el-input v-model="forgetForm.merchantAccount" placeholder="请输入用户名"></el-input>
                     </el-form-item>
 
-                    <el-form-item label="验证码：">
-                        <el-input v-model="forgetForm.code"></el-input>
+                    <el-form-item label="" prop="mobile">
+                        <el-input v-model="forgetForm.mobile" placeholder="请输入手机号"></el-input>
                     </el-form-item>
 
-                    <el-button @click="verificationCode">接收短信验证码</el-button>
+                    <Verify :barSize="{width: '478px',height: '58px'}" @success="verifyData(1)" @error="verifyData(0)" :type="3" :showButton="false"></Verify>
+
+                    <el-button @click="verificationCode('forgetForm')">接收短信验证码</el-button>
+                </el-form>
+
+                <el-form ref="newPassword" :rules="newPasswordRules" :model="newPassword" v-else>
+
+                    <el-form-item label="" prop="name">
+                        <el-input v-model="newPassword.name" :disabled="true"></el-input>
+                    </el-form-item>
+
+                    <el-form-item label="">
+                        <el-input v-model="newPassword.code" placeholder="请输入手机验证码"></el-input>
+                    </el-form-item>
+
+                    <el-form-item label="" prop="pass">
+                        <el-input type="password" v-model="newPassword.pass" placeholder="请输入密码"></el-input>
+                    </el-form-item>
+
+                    <el-form-item label="" prop="password">
+                        <el-input type="password" v-model="newPassword.password"  placeholder="请再次输入密码"></el-input>
+                    </el-form-item>
+
+                    <el-button @click="confirmModifyPass('newPassword')">接收短信验证码</el-button>
                 </el-form>
             </div>
         </div>
@@ -21,24 +47,128 @@
 </template>
 
 <script>
+    import Verify from 'vue2-verify'
     export default {
         name: "ForgetPassword",
+        methods: {
+            /*获取验证码*/
+            verificationCode(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        if(this.codeStatus === 1){
+                            this.getStatus = 1;
+                            let data = {
+                                value: this.forgetForm.mobile
+                            };
+                            this.$http.getCode(data); //发送验证码
+                            this.$refs[formName].clearValidate();
+                            this.newPassword.name = this.forgetForm.merchantAccount;
+                            this.mobile = this.forgetForm.mobile;
+                        }else{
+                            this.$message.error('验证失败')
+                        }
+                    }
+                });
+            },
+            /*提交修改密码*/
+            confirmModifyPass(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        let codeData = {
+                            "mobile": this.forgetForm.mobile,
+                            "captcha": this.newPassword.code
+                        };
+                        this.$http.checkCode(codeData).then((res) => {
+                            if(res === 200){
+                                let data = {
+                                    "name": this.newPassword.name,
+                                    "newPassword": this.newPassword.password
+                                };
+                                this.$http.forgetPassword(data);
+                                this.$router.push('/');
+                            }
+                        });
+
+                    }
+                });
+            },
+            verifyData(data) {
+                data !== 0 ? this.codeStatus = 1 : this.$message.error('验证失败');
+            }
+        },
+        components: {Verify},
         data () {
+            let validateMobile = (rule, value, callback) => {
+                let pattern = /^1[345678]\d{9}$/;
+                if (value === '') {
+                    callback(new Error('请填写手机号'));
+                } else if(!pattern.test(value)){
+                    callback(new Error('请填写正确的手机号'));
+                }else{
+                    callback();
+                }
+            };
+            let validatePass = (rule, value, callback) => {
+                let pattern = /^[a-zA-Z0-9]{6,20}$/;
+                if (value === '') {
+                    callback(new Error('请输入密码'));
+                }else if(!pattern.test(value)){
+                    callback(new Error('请输入6-20位数字和字母组合密码'));
+                } else {
+                    if (this.newPassword.password !== '') {
+                        this.$refs.newPassword.validateField('password');
+                    }
+                    callback();
+                }
+            };
+            let validatePass2 = (rule, value, callback) => {
+                if (value === '') {
+                    callback(new Error('请输入填写密码'));
+                } else if (value !== this.newPassword.pass) {
+                    callback(new Error('两次输入密码不一致'));
+                } else {
+                    callback();
+                }
+            };
             return {
                 forgetForm: {
                     merchantAccount: '',
-                    code: ''
-                }
-            }
-        },
-        methods: {
-            verificationCode() {
-                this.$router.push('/')
+                    mobile: '',
+                },
+                forgetRules: {
+                    merchantAccount: [{required: true, message: '请输入用户名', trigger: 'blur'}],
+                    mobile: [{required: true, validator: validateMobile, trigger: 'blur'}],
+                },
+                newPassword: {
+                    name: '',
+                    code: '',
+                    pass: '',
+                    password: ''
+                },
+                newPasswordRules: {
+                    name: [
+                        {required: true, message: '请输入用户名', trigger: 'blur'},
+                    ],
+                    pass: [
+                        { required: true, validator: validatePass, trigger: 'blur' }
+                    ],
+                    password: [
+                        { required: true, validator: validatePass2, trigger: 'blur' }
+                    ],
+                },
+                mobile: '',
+                getStatus: 0,
+                codeStatus: 0, //0: 失败 1: 成功
             }
         }
     }
 </script>
 
-<style scoped>
-
+<style>
+    .verify-bar-area .verify-left-bar{
+        background: none!important;
+    }
+    .icon-check:before{
+        background-size: cover;
+    }
 </style>

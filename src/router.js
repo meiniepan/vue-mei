@@ -1,9 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-/*登陆*/
+/*登录*/
 import Login from './views/Login/Login'
 import ForgetPassword from './views/Login/ForgetPassword'
+import Register from './views/Login/Register'
 
 import Header from './views/Header'
 
@@ -53,13 +54,17 @@ export default new Router({
       component: ForgetPassword
     },
     {
+      path: '/register',
+      component: Register,
+    },
+    {
       path: '/overview',
       name: 'header',
       component: Header,
       children: [
           {
             path: '/overview',
-            component: ShopOverview
+            component: ShopOverview,
           },
           {
               path: '/content',

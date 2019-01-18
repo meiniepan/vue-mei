@@ -284,16 +284,27 @@ const interfaceData = {
     login(idData) {
         return axios.post('/merchant/login', idData)
             .then((res) => {
-                if(res.data.code === 200){
-                    return res.data.code
-                }else{
-                    return Message.error(res.data.message);
-                }
+                return res.data;
             })
     },
     /*注册*/
-    merchantCreate(createData) {
-        return axios.post('/merchant/create', createData)
+    merchantCreate(data) {
+        return axios.post('/merchant/create', data)
+            .then((res) => {
+                return res.data;
+            })
+    },
+    /*忘记密码*/
+    forgetPassword(data) {
+        httpPost('/password/retrieve', data);
+    },
+    /*发送验证码*/
+    getCode(data) {
+        httpPost('/captcha/', data);
+    },
+    /*验证验证码*/
+    checkCode(data) {
+        return axios.post('/captcha/check', data)
             .then((res) => {
                 if(res.data.code === 200){
                     return res.data.code;
@@ -301,6 +312,24 @@ const interfaceData = {
                     return Message.error(res.data.message);
                 }
             })
-    },
+    }
 };
+
+function httpPost(httpUrl, paramet) {
+    return axios.post(httpUrl, paramet)
+        .then((res) => {
+            if(res.data.code === 200){
+                if(res.data.data){
+                    console.log('数据');
+                    return res.data.data;
+                }else{
+                    console.log('信息');
+                    return Message.success(res.data.message);
+                }
+            }else{
+                return Message.error(res.data.message);
+            }
+        })
+}
+
 export default interfaceData;
