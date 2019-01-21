@@ -28,6 +28,16 @@
     export default {
         name: "Login",
         data () {
+            let validatePass = (rule, value, callback) => {
+                let pattern = /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/;
+                if (value === '') {
+                    callback(new Error('请输入密码'));
+                }else if(!pattern.test(value)){
+                    callback(new Error('请输入6-20位字母和数字组合密码'));
+                } else {
+                    callback();
+                }
+            };
             return {
                 loginForm: {
                     phone: '',
@@ -50,6 +60,7 @@
                                         this.$message.success(res.message);
                                         this.$store.commit('SET_SHOP_ID', res.data.shopIdList[0].id);
                                         this.$store.commit('SET_NAME', res.data.shopIdList[0].name);
+                                        this.$store.commit('SET_MOBILE', res.data.merchantMobile);
                                         this.$router.push('/overview');
                                     }else if(res.code === 203){
                                         this.$router.push({

@@ -16,6 +16,7 @@ import './style/index.scss'
 
 Vue.prototype.$http = service;
 Vue.prototype.$ipfsUrl = 'http://192.168.1.186:8081/ipfs/';
+Vue.prototype.$imgUrl = 'http://adminexample.com/files/add';
 Vue.config.productionTip = false;
 
 new Vue({

@@ -7,16 +7,11 @@ export default new Vuex.Store({
     state: {
         name: window.sessionStorage.getItem('name'),
         shopId: window.sessionStorage.getItem('shopId'),
+        mobile: window.sessionStorage.getItem('mobile'),
     },
     actions: {
-        changeCity (ctx,city) {
-            ctx.commit('changeCity',city)
-        }
     },
     mutations: {
-        changeCity (state,city) {
-            state.city = city
-        },
         //设置店铺id
         SET_SHOP_ID (state, data) {
             state.shopId = data;
@@ -27,12 +22,19 @@ export default new Vuex.Store({
             state.name = data;
             window.sessionStorage.setItem('name', data);
         },
+        //设置手机号
+        SET_MOBILE(state, data) {
+            state.mobile = data;
+            window.sessionStorage.setItem('mobile', data);
+        },
         //退出登录
         LOGIN_OUT (state) {
             state.shopId = null;
             state.name = null;
+            state.mobile = null;
             window.sessionStorage.removeItem('shopId');
             window.sessionStorage.removeItem('name');
+            window.sessionStorage.removeItem('mobile');
         }
     }
 })

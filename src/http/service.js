@@ -151,15 +151,8 @@ const interfaceData = {
             })
     },
     /*新增店铺管理员*/
-    addShopAdmin(adminData) {
-        return axios.post('/staff/add', adminData)
-            .then((res) => {
-                if(res.data.code === 200){
-                    return res.data.code;
-                }else{
-                    return Message.error(res.data.message);
-                }
-            })
+    addShopAdmin(data) {
+        httpPost('/staff/add', data);
     },
     /*获取所有管理员信息*/
     getAdminList(shopId) {
@@ -173,15 +166,8 @@ const interfaceData = {
             })
     },
     /*编辑管理员*/
-    modifyStaff(staffId) {
-        return axios.post('/shop/staff/modify', staffId)
-            .then((res) => {
-                if(res.data.code === 200){
-                    return res.data.code
-                }else{
-                    return Message.error(res.data.message);
-                }
-            })
+    modifyStaff(data) {
+        httpPost('/shop/staff/modify', data);
     },
     /*删除管理员*/
     deleteStaff(staffId) {
@@ -222,15 +208,19 @@ const interfaceData = {
                 return res.data;
             })
     },
-    /*获取店铺信息*/
-    getShopMsg(shopId) {
-        return axios.post('/shop/detail', shopId).then((res) => {
-            if(res.data.code){
+    /*店铺信息详情*/
+    getShopMsg(data) {
+        return axios.post('/shop/detail', data).then((res) => {
+            if(res.data.code === 200){
                 return res.data.data
             }else{
                 return Message.error(res.data.message);
             }
         })
+    },
+    /*编辑店铺信息*/
+    ModifyShopMsg(data) {
+        httpPost('/shop/modify', data);
     },
     /*获取店铺服务销量前10*/
     getShopSalesVolume(shopId) {
@@ -327,7 +317,7 @@ function httpPost(httpUrl, paramet) {
         .then((res) => {
             console.log(res);
             if(res.data.code === 200){
-                if(res.data.data){
+                if(!res.data.data){
                     console.log('数据');
                     return res.data.data;
                 }else{

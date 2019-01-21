@@ -16,7 +16,7 @@
                         prop="account"
                         label="账号">
                     <template slot-scope="scope">
-                        <el-input v-model.number="scope.row.account" @change="modifyAccount(scope.row)"></el-input>
+                        <el-input v-model="scope.row.account" @change="modifyAccount(scope.row)"></el-input>
                     </template>
                 </el-table-column>
                 <el-table-column
@@ -76,7 +76,7 @@
             </div>
             <el-button type="primary" @click="editStaff">添加管理员</el-button>
         </div>
-        <staff-component v-else></staff-component>
+        <staff-component v-else v-on:staffBack="headCall"></staff-component>
     </div>
 </template>
 
@@ -108,7 +108,7 @@
                     cancelButtonText: '取消',
                 }).then(() => {
                     let data = {
-                        shopId: '5c3835383b775072a06a5329',
+                        shopId: this.$store.state.shopId,
                         staffIdList: [row.id]
                     };
                     console.log(data);
@@ -155,16 +155,19 @@
             confirmModify(row) {
                 if(this.modifyStaff.name !== undefined || this.modifyStaff.mobile !== undefined || this.modifyStaff.permissionList !== undefined){
                     if(this.staffId === row.id){
-                        this.$set(this.modifyStaff, 'shopId', '5c3835383b775072a06a5329');
+                        this.$set(this.modifyStaff, 'shopId', this.$store.state.shopId);
                         this.$set(this.modifyStaff, 'staffId', row.id);
-                        console.log(this.modifyStaff);
-                        this.$http.modifyStaff(this.modifyMechanic)
-                            .then((res) => {
-                                this.getListData(1);
-                            })
+                        this.$http.modifyStaff(this.modifyStaff);
                     }
                 }else{
                     console.log('失败');
+                }
+            },
+            headCall(msg) {
+                if(msg === 0){
+                    this.staffState = 0;
+                    this.staffData = [];
+                    this.getListData(1);
                 }
             },
             changeModify(staffId,fieldName, fieldval) {
@@ -182,17 +185,15 @@
                     }else{
                         baseData = this.staffData[0].id;
                     }
-                };
+                }
                 let data = {
-                    "shopId": "5c3835383b775072a06a5329",
+                    "shopId": this.$store.state.shopId,
                     "baseObjectId": baseData,
                     "direction": direction
                 };
                 this.$http.getAdminList(data).then((res) => {
                     if(res.length === 0){
-                        this.$alert('没有更多数据', '', {
-                            cancelButtonText: '确定'
-                        });
+                        this.$message.error('没有更多数据');
                         return;
                     }else{
                         this.staffData = [];

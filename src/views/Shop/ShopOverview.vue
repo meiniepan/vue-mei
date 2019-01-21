@@ -14,10 +14,10 @@
             </div>
         </div>
         <ul class="order-quantity">
-            <li>总订单数量<p>88</p></li>
-            <li>已付款订单数量<p>88</p></li>
+            <li>总订单数量<p>{{shopMsg.orderAmount}}</p></li>
+            <li>已付款订单数量<p>{{shopMsg.orderPaidAmount}}</p></li>
             <li>销售总额<p>88888</p></li>
-            <li>服务（商品）数量<p>88</p></li>
+            <li>服务（商品）数量<p>{{shopMsg.serviceAmount}}</p></li>
         </ul>
         <display-component></display-component>
         <div class="sales-statistics">
@@ -98,9 +98,12 @@
             };
             this.$http.getShopMsg(data).then((res) => {
                 this.shopMsg = {
-                  name: res.name,
-                  logo: this.$ipfsUrl + res.logo,
-                  createTime: timestampToString(res.createTime)
+                    name: res.name,
+                    logo: this.$ipfsUrl + res.logo,
+                    createTime: timestampToString(res.createTime),
+                    orderAmount: res.orderAmount,
+                    orderPaidAmount: res.orderPaidAmount,
+                    serviceAmount: res.serviceAmount
                 };
             });
             /*this.$http.getShopSalesVolume(data).then((res) => {
