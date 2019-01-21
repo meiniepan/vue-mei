@@ -12,10 +12,6 @@
                         <el-input v-model="forgetForm.merchantAccount" placeholder="请输入用户名"></el-input>
                     </el-form-item>
 
-                    <el-form-item label="" prop="mobile">
-                        <el-input v-model="forgetForm.mobile" placeholder="请输入手机号"></el-input>
-                    </el-form-item>
-
                     <Verify :barSize="{width: '478px',height: '58px'}" @success="verifyData(1)" @error="verifyData(0)" :type="3" :showButton="false"></Verify>
 
                     <el-button @click="verificationCode('forgetForm')">接收短信验证码</el-button>
@@ -56,14 +52,24 @@
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         if(this.codeStatus === 1){
-                            this.getStatus = 1;
                             let data = {
-                                value: this.forgetForm.mobile
-                            };
-                            this.$http.getCode(data); //发送验证码
-                            this.$refs[formName].clearValidate();
-                            this.newPassword.name = this.forgetForm.merchantAccount;
-                            this.mobile = this.forgetForm.mobile;
+                                merchantName: this.forgetForm.merchantAccount
+                            }
+                            this.$http.getMerchantDetail(data)
+                                .then((res) => {
+                                    if(res.code === 200){
+                                        this.getStatus = 1;
+                                        let data = {
+                                            value: res.data.mobile
+                                        };
+                                        this.$http.getCode(data); //发送验证码
+                                        this.$refs[formName].clearValidate();
+                                        this.newPassword.name = this.forgetForm.merchantAccount;
+                                        this.mobile = res.data.mobile;
+                                    }else{
+                                        this.$message.error(res.message);
+                                    }
+                                })
                         }else{
                             this.$message.error('验证失败')
                         }
@@ -109,7 +115,7 @@
                 }
             };
             let validatePass = (rule, value, callback) => {
-                let pattern = /^[a-zA-Z0-9]{6,20}$/;
+                let pattern = /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/;
                 if (value === '') {
                     callback(new Error('请输入密码'));
                 }else if(!pattern.test(value)){

@@ -295,6 +295,13 @@ const interfaceData = {
     forgetPassword(data) {
         httpPost('/password/retrieve', data);
     },
+    /*获取商家账号详情*/
+    getMerchantDetail(data) {
+        return axios.post('/merchant/detail', data)
+            .then((res) => {
+                return res.data;
+            })
+    },
     /*发送验证码*/
     getCode(data) {
         httpPost('/captcha/', data);
