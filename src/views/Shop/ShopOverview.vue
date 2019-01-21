@@ -94,19 +94,19 @@
         },
         created () {
             let data = {
-                "shopId": "5c36be373b77504787b2e7e4"
+                "shopId": this.$store.state.shopId
             };
             this.$http.getShopMsg(data).then((res) => {
                 this.shopMsg = {
                   name: res.name,
-                  logo: 'http://192.168.1.186:8081/ipfs/' + res.logo,
+                  logo: this.$ipfsUrl + res.logo,
                   createTime: timestampToString(res.createTime)
                 };
             });
-            this.$http.getShopSalesVolume(data).then((res) => {
-                console.log(res);
+            /*this.$http.getShopSalesVolume(data).then((res) => {
+                //console.log(res);
                 for(let goodsId in res){
-                    console.log(res[goodsId]);
+                    //console.log(res[goodsId]);
                     let orderId = {
                         serviceId: res[goodsId]
                     };
@@ -114,7 +114,7 @@
                         console.log(res)
                     })
                 }
-            })
+            })*/
         },
         methods: {
             goodsAdd() {

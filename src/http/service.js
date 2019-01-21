@@ -216,14 +216,10 @@ const interfaceData = {
             })
     },
     /*创建店铺*/
-    addShop(shopMsg) {
-        return axios.post('/shop/create', shopMsg)
+    addShop(data) {
+        return axios.post('/shop/create', data)
             .then((res) => {
-                if(res.data.code === 200){
-                    return res.data.code;
-                }else{
-                    return Message.error(res.data.message);
-                }
+                return res.data;
             })
     },
     /*获取店铺信息*/
