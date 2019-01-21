@@ -294,6 +294,17 @@ const interfaceData = {
                 return res.data;
             })
     },
+    /*设置*/
+    configuration(data) {
+        return axios.post('/configure', data)
+            .then((res) => {
+                if(res.data.code === 200){
+                    return res.data.code;
+                }else{
+                    return Message.error(res.data.message);
+                }
+            })
+    },
     /*忘记密码*/
     forgetPassword(data) {
         httpPost('/password/retrieve', data);
@@ -318,6 +329,7 @@ const interfaceData = {
 function httpPost(httpUrl, paramet) {
     return axios.post(httpUrl, paramet)
         .then((res) => {
+            console.log(res);
             if(res.data.code === 200){
                 if(res.data.data){
                     console.log('数据');
