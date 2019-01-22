@@ -14,10 +14,10 @@
                     </el-menu-item-group>
                 </el-submenu>
                 <el-submenu index="2">
-                    <template slot="title"><i class="el-icon-message"></i>商品</template>
+                    <template slot="title"><i class="el-icon-message"></i>服务</template>
                     <el-menu-item-group>
                         <template slot="title">
-                            <el-menu-item index="/goods">商品管理</el-menu-item>
+                            <el-menu-item index="/goods">服务管理</el-menu-item>
                         </template>
                     </el-menu-item-group>
                 </el-submenu>

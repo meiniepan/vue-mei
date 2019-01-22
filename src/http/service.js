@@ -18,7 +18,7 @@ const interfaceData = {
                 }
             })
     },
-    /*添加商品*/
+    /*添加服务*/
     addGoods(paramsdata) {
         return axios.post('/service/create', paramsdata)
             .then((res) => {
@@ -29,7 +29,7 @@ const interfaceData = {
                 }
             });
     },
-    /*编辑商品*/
+    /*编辑服务*/
     modifyGoods(modifyData) {
         return axios.post('/service/modify', modifyData)
             .then((res) => {
@@ -40,7 +40,7 @@ const interfaceData = {
                 }
             })
     },
-    /*获取商品详情*/
+    /*获取服务详情*/
     getGoodsDetail(detailData) {
         return axios.post('/service/detail', detailData)
             .then((res) => {
@@ -51,7 +51,7 @@ const interfaceData = {
                 }
             })
     },
-    /*获取所有商品列表*/
+    /*获取所有服务列表*/
     getGoods(shopData) {
         return axios.post('/service/get',shopData)
             .then((res) => {
@@ -62,7 +62,18 @@ const interfaceData = {
                 }
             })
     },
-    /*商品下架*/
+    /*获取服务状态值*/
+    getStatus(data) {
+        return axios.post('/status/detail',data)
+            .then((res) => {
+                if(res.data.code === 200){
+                    return res.data.data.comment;
+                }else{
+                    return Message.error(res.data.message);
+                }
+            })
+    },
+    /*服务下架*/
     goodsShelves(GoodsData) {
         return axios.post('/service/off',GoodsData)
             .then((res) => {
@@ -73,7 +84,7 @@ const interfaceData = {
                 }
             })
     },
-    /*商品删除*/
+    /*服务删除*/
     goodsDelete(serviceId) {
         return axios.post('/service/delete', serviceId)
             .then((res) => {

@@ -37,7 +37,6 @@
                                     "name": this.loginForm.name,
                                     "password": this.loginForm.password
                                 };
-                                console.log(data);
                                 this.$http.login(data).then((res) => {
                                     if(res.code === 200){
                                         this.$message.success(res.message);
@@ -53,6 +52,8 @@
                                                 id: res.data.merchantId
                                             }
                                         });
+                                    }else {
+                                        this.$message.error(res.message);
                                     }
                                 });
                             }else{
