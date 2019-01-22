@@ -80,7 +80,7 @@
             </el-table-column>
             <el-table-column
                     prop="serviceName"
-                    label="商品名称"
+                    label="服务名称"
                     align="center">
                 <template slot-scope="scope">
                     <img :src="scope.row.imageMain" style="display:inline-block;line-height: 20px" />
@@ -117,7 +117,7 @@
                             size="mini"
                             type="primary"
                             plain
-                            @click="navigateDetail(scope.row.serviceId)">详情
+                            @click="navigateDetail(scope.row.orderImplId)">详情
                     </el-button>
                     <el-button
                             size="mini"
@@ -184,10 +184,10 @@
             async getOrderList(direction) {
 
                 let data = {
-                    "shopId": "5c3835383b775072a06a5329",
+                    "shopId": this.$store.state.shopId,
                     "direction": direction,
                     "baseObjectId": "1",
-                    "statusList": [0,1,2,3,4,5]
+                    "statusList": [1]
                 };
                 this.$http.getOrderList(data)
                     .then((res) => {
@@ -195,6 +195,7 @@
                            let val = res[orderId];
                            this.orderData.push({
                                "serviceId": val.serviceId,
+                               "orderImplId": val.orderImplId,
                                "address": val.address,
                                "amount": val.amount,
                                "contact": val.contact,
@@ -210,12 +211,12 @@
                        }
                     });
             },
-            navigateDetail(serviceId) {
+            navigateDetail(orderImplId) {
                 this.$router.push({
                     path: '/orderDetail',
-                    name: 'OrderList',
+                    name: 'OrderDetail',
                     params: {
-                        id: serviceId
+                        id: orderImplId
                     }
                 });
             }

@@ -24,7 +24,7 @@
                         width="250px">
                     <template slot-scope="scope">
                         <img style="float: left;margin-right: 10px" alt="" width="80" height="80"
-                             :src="scope.row.images"/>
+                             :src="$imgUrl + scope.row.images"/>
                         <div>
                             <p class="order-detail-serve-name">{{ scope.row.name }}</p>
                             <p style="margin-top: 30px">{{ scope.row.tag }}</p>
@@ -63,11 +63,11 @@
 
         <div class="order-detail-info">
             <div class="order-detail-title">订单信息</div>
-            <div class="order-item">订单编号：<span>{{orderDetailTable[0].serial}}</span></div>
+            <div class="order-item">订单编号：<span>{{orderDetail.serial}}</span></div>
             <div class="order-item">服务方式：<span>站点服务</span></div>
-            <div class="order-item">收货人：<span>{{orderDetailTable[0].contact}}</span></div>
-            <div class="order-item">收货电话：<span>{{orderDetailTable[0].mobile}}</span></div>
-            <div class="order-item">收货地址： <span>{{orderDetailTable[0].address}}</span></div>
+            <div class="order-item">收货人：<span>{{orderDetail.contact}}</span></div>
+            <div class="order-item">收货电话：<span>{{orderDetail.mobile}}</span></div>
+            <div class="order-item">收货地址： <span>{{orderDetail.address}}</span></div>
             <div class="order-item">买家留言： <span>无</span></div>
         </div>
 
@@ -75,7 +75,7 @@
             <div class="order-detail-title">支付信息</div>
             <div class="order-item">支付流水：<span>2016060232113121313121313131313131</span></div>
             <div class="order-item">费用类型：<span>首次支付</span></div>
-            <div class="order-item">支付方式： <span>{{orderDetailTable[0].payType}}</span></div>
+            <div class="order-item">支付方式： <span>{{orderDetail.payType}}</span></div>
             <div class="order-item">支付时间： <span>2018-11-17 16:00-18:00</span></div>
         </div>
 
@@ -93,13 +93,14 @@
             return {
                 status: 2,
                 paid: true,
-                orderId:'',
-                orderDetailTable: []
+                orderImplId:'',
+                orderDetailTable: [],
+                orderDetail: {}
             }
         },
 
-        mounted(){
-            this.orderId = this.$route.params.id;
+        created(){
+            this.orderImplId = this.$route.params.id;
             //console.log(this.orderId);
             this.getOrderDetail();
         },
@@ -107,11 +108,10 @@
         methods: {
             getOrderDetail() {
                 let data = {
-                    "shopId": "5c3835383b775072a06a5329",
-                    "orderImplId": '5c3e81913b77506ae0a98ea4'
+                    "shopId": this.$store.state.shopId,
+                    "orderImplId": this.orderImplId
                 };
                 this.$http.getOrderDetail(data).then((res) => {
-                    //console.log(res);
                     this.orderDetailTable.push({
                         images: res.orderImplInfo.images,
                         amount: res.orderImplInfo.amount,
@@ -119,13 +119,14 @@
                         price: res.orderImplInfo.price,
                         status: res.orderImplInfo.status,
                         underline: res.orderImplInfo.underline,
-
+                    });
+                    this.orderDetail = {
                         address: res.orderInfo.address,
                         contact: res.orderInfo.contact,
                         mobile: res.orderInfo.mobile,
                         payType: res.orderInfo.payType,
                         serial: res.orderInfo.serial
-                    })
+                    }
                 })
             },
             goBack() {

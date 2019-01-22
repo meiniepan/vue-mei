@@ -30,27 +30,27 @@
                 </el-form-item>
             </el-form>
         </div>
-        <el-table :data="tableData" border style="width: 100%" highlight-current-row>
-            <el-table-column prop="index" label="序号" width="80" align="center">
+        <el-table :data="tableData" border style="width: 100%">
+            <el-table-column prop="index" label="序号" align="center">
             </el-table-column>
-            <el-table-column prop="account" label="买家账号" width="180" align="center">
+            <el-table-column prop="account" label="买家账号" align="center">
             </el-table-column>
-            <el-table-column prop="name" label="收货人" width="180" align="center">
+            <el-table-column prop="name" label="收货人" align="center">
             </el-table-column>
-            <el-table-column prop="address" label="收货人地址" width="300" align="center">
+            <el-table-column prop="address" label="收货人地址" align="center">
             </el-table-column>
-            <el-table-column prop="phone" label="收货人手机号" width="180" align="center">
+            <el-table-column prop="phone" label="收货人手机号" align="center">
             </el-table-column>
-            <el-table-column prop="order_num" label="订单编号" width="180" align="center">
+            <el-table-column prop="order_num" label="订单编号" align="center">
                 <template slot-scope="scope">
                     <el-button type="text" @click="handleOrderNumClick(scope.row.order_num)">{{ scope.row.order_num }}</el-button>
                 </template>
             </el-table-column>
-            <el-table-column prop="date" label="下单时间" width="180" align="center">
+            <el-table-column prop="date" label="下单时间" align="center">
             </el-table-column>
-            <el-table-column prop="amount" label="订单金额" width="180" align="center">
+            <el-table-column prop="amount" label="订单金额" align="center">
             </el-table-column>
-            <el-table-column prop="method" label="支付方式" width="180" align="center">
+            <el-table-column prop="method" label="支付方式" align="center">
             </el-table-column>
         </el-table>
         <div class="page-btn">
@@ -85,7 +85,7 @@ export default {
     },
     methods: {
         getListData(direction) {
-            let baseId = "0";
+            let baseId = "111";
             let dataLen = this.tableData.length;
 
             if (dataLen !== 0) {
@@ -97,13 +97,14 @@ export default {
             }
             // console.log('===>' + baseId);
             let data = {
-                "shopId": "5c3835383b775072a06a5329",
+                "shopId": this.$store.state.shopId,
                 "direction": direction,
                 "baseObjectId": baseId
             };
             this.$http.getCustomerList(data).then((res) => {
-                if (res == '') {
-                    console.log('return');
+                if (res.length === 0) {
+                    this.$message.error('没有更多数据');
+                    return;
                 } else {
                     this.tableData = [];
                     for(let listId in res){
@@ -117,7 +118,7 @@ export default {
                             phone: item.mobile,
                             order_num: item.serial,
                             date: timestampToString(item.createTime),
-                            amount: item.amount,
+                            amount: item.payAmount,
                             method: (item.payType === 0) ? '微信支付' : '支付宝支付',
                             id: item.id
                         });
