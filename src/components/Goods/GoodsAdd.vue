@@ -198,21 +198,23 @@
                 };
                 this.$http.getGoodsDetail(detailData)
                     .then((res) => {
+                        let specArr = [];
                         for(let imgUrl in res.images){
                             this.goodsForm.serviceImg.push({
                                 response:{data:{fileHash: res.images[imgUrl]}},
                                 url: 'http://192.168.1.186:8081/ipfs/' + res.images[imgUrl]
                             });
                         }
-                        let specArr = [];
                         for(let item in res.specification){
                             specArr.push(JSON.parse(res.specification[item]));
                         }
+                        this.advertType = res.adWordStatus === 0 ? true : false;
+                        this.advertType === true ? res.adWord = '' : res.adWord;
                         this.goodsForm = {
                             serviceName: res.name,
                             serviceImg: this.goodsForm.serviceImg,
                             price: res.price,
-                            advert: res.price,
+                            advert: res.adWord,
                             classify: res.tag,
                             addSpec: specArr,
                             spec: res.specification.length > 0 ? '1' : '0',
@@ -221,7 +223,6 @@
                             orderCost: res.underline,
                             tinymceHtml: res.content
                         };
-                        this.advertType = res.advertType;
                     });
             }
         },

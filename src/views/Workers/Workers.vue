@@ -91,7 +91,12 @@
                 this.mechanicId = currentRow.mechanicId;
             },
             phoneModify(row) {
-                this.changeModify(row.mechanicId, 'mobile', row.phone);
+                let pattern = /^1[345678]\d{9}$/;
+                if(!pattern.test(row.phone)){
+                    this.$message.error('请填写正确的手机号');
+                }else{
+                    this.changeModify(row.mechanicId, 'mobile', row.phone);
+                }
             },
             nameModify(row) {
                 this.changeModify(row.mechanicId, 'name', row.name);
@@ -101,18 +106,14 @@
             },
             /*保存编辑*/
             saveModify (row) {
-                console.log(this.modifyMechanic);
                 if(this.modifyMechanic.name !== undefined || this.modifyMechanic.mobile !== undefined || this.modifyMechanic.status !== undefined){
                     if(this.mechanicId === row.mechanicId){
                         this.$set(this.modifyMechanic, 'mechanicId', row.mechanicId);
                         this.$http.modifyMechanic(this.modifyMechanic)
                             .then((res) => {
-                                console.log(res);
-                                this.getMechanicList();
+                                if(res === 200) this.getMechanicList(1);
                             })
                     }
-                }else{
-                    console.log('失败');
                 }
             },
             deleteModify(list) {
@@ -121,17 +122,12 @@
                     cancelButtonText: '取消',
                 }).then(() => {
                     let deleteData = {
-                        shopId: '5c3835383b775072a06a5329',
+                        shopId: this.$store.state.shopId,
                         mechanicId: list.mechanicId
                     };
                     this.$http.deleteMechanic(deleteData)
                         .then((res) => {
-                            this.mechanicData = [];
-                            this.getMechanicList(1);
-                            this.$message({
-                                type: 'success',
-                                message: '删除成功!'
-                            });
+                            if(res === 200) this.mechanicData = []; this.getMechanicList(1);
                         });
                 }).catch(() => {
                     this.$message({
@@ -166,16 +162,14 @@
                     }
                 }
                 let listData = {
-                    shopId: '5c3835383b775072a06a5329',
+                    shopId: this.$store.state.shopId,
                     "direction": direction,
                     "baseObjectId": baseData,
                     "statusList": [0,1],
                 };
                 this.$http.getMechanic(listData).then((res) => {
                     if(res.length === 0){
-                        this.$alert('没有更多数据', '', {
-                            cancelButtonText: '确定'
-                        });
+                        this.$message.error('没有更多数据');
                         return;
                     }else {
                         this.mechanicData = [];

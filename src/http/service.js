@@ -96,48 +96,28 @@ const interfaceData = {
             })
     },
     /*获取所有技工列表*/
-    getMechanic(mechanicList) {
-        return axios.post('/shop/mechanic/get',mechanicList)
-            .then((res) => {
-                if(res.data.code === 200){
-                    return res.data.data.mechanicSet;
-                }else{
-                    return Message.error(res.data.message);
-                }
-            })
+    getMechanic(data) {
+        return httpPost('/shop/mechanic/get', data).then((res) => {
+            return res.mechanicSet;
+        });
     },
     /*新增技工*/
-    addMechanic(mechanicData) {
-        return axios.post('/mechanic/create', mechanicData)
-            .then((res) => {
-                if(res.data.code === 200){
-                    return res.data.code;
-                }else{
-                    return Message.error(res.data.message);
-                }
-            });
+    addMechanic(data) {
+        return httpPost('/mechanic/create', data).then((res) => {
+            return res;
+        } );
     },
     /*编辑技工*/
-    modifyMechanic(mechanicId) {
-        return axios.post('/mechanic/modify', mechanicId)
-            .then((res) => {
-                if(res.data.code === 200){
-                    return res.data.code
-                }else{
-                    return Message.error(res.data.message);
-                }
-            })
+    modifyMechanic(data) {
+        return httpPost('/mechanic/modify', data).then((res) => {
+            return res;
+        });
     },
     /*删除技工*/
-    deleteMechanic(mechanicId) {
-        return axios.post('/shop/mechanic/remove', mechanicId)
-            .then((res) => {
-                if(res.data.code === 200){
-                    return res.data.code
-                }else{
-                    return Message.error(res.data.message);
-                }
-            })
+    deleteMechanic(data) {
+        return httpPost('/shop/mechanic/remove', data).then((res) => {
+            return res;
+        });
     },
     /*资产总销售额*/
     getTotalSales(salesData) {
@@ -330,22 +310,27 @@ const interfaceData = {
     }
 };
 
-function httpPost(httpUrl, paramet) {
-    return axios.post(httpUrl, paramet)
-        .then((res) => {
-            console.log(res);
-            if(res.data.code === 200){
-                if(!res.data.data){
-                    console.log('数据');
-                    return res.data.data;
+function httpPost(httpUrl, paramet){
+    return new Promise((resolve,reject) => {
+        axios.post(httpUrl,paramet)
+            .then(res => {
+                if(res.data.code === 200){
+                    if(Object.keys(res.data.data).length == 0){
+                        console.log(111 + '信息');
+                        Message.success(res.data.message);
+                        resolve(res.data.code);
+                    }else{
+                        console.log(222 + '数据');
+                        resolve(res.data.data);
+                    }
                 }else{
-                    console.log('信息');
-                    return Message.success(res.data.message);
+                    Message.error(res.data.message);
+                    resolve(res.data.code);
                 }
-            }else{
-                return Message.error(res.data.message);
-            }
-        })
+            },err => {
+                reject(err)
+            })
+    })
 }
 
 export default interfaceData;
