@@ -51,10 +51,45 @@
 <script>
     export default {
         name: "StaffModify",
+        created() {
+            this.$http.getAdminAuthority().then((res) => {
+                this.checkbox = res;
+            })
+        },
+        methods: {
+            keepAdmin(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        let adminData = {
+                            "name": this.staffForm.name,
+                            "shopId": this.$store.state.shopId,
+                            "mobile": this.staffForm.account,
+                            "password": this.staffForm.checkPass,
+                            "permissionList": this.staffForm.type
+                        };
+                        this.$http.addShopAdmin(adminData);
+                        this.$emit('staffBack', 0);
+                    }
+                })
+            }
+        },
         data () {
-            let validatePass = (rule, value, callback) => {
+            let validateAccount  = (rule, value, callback) => {
+                let pattern = /^1[345678]\d{9}$/;
                 if (value === '') {
-                    callback(new Error('请输入密码'));
+                    callback(new Error('请填写手机号'));
+                } else if(!pattern.test(value)){
+                    callback(new Error('请填写正确的手机号'));
+                }else{
+                    callback();
+                }
+            };
+            let validatePass = (rule, value, callback) => {
+                let pattern = /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/;
+                if (value === '') {
+                    callback(new Error('请设置密码'));
+                }else if(!pattern.test(value)){
+                    callback(new Error('请设置6-20位字母和数字组合密码'));
                 } else {
                     if (this.staffForm.checkPass !== '') {
                         this.$refs.staffForm.validateField('checkPass');
@@ -81,10 +116,10 @@
                 },
                 rules: {
                     account: [
-                        { required: true, message: '请输入管理员账号', trigger: 'blur' },
+                        { required: true, validator: validateAccount, trigger: 'blur' },
                     ],
                     name: [
-                        { required: true, message: '请输入管理员昵称', trigger: 'blur' },
+                        { required: true, message: '请填写管理员昵称', trigger: 'blur' },
                     ],
                     pass: [
                         { validator: validatePass, trigger: 'blur', required: true }
@@ -120,30 +155,6 @@
                 ]
             }
         },
-        created() {
-            this.$http.getAdminAuthority().then((res) => {
-                this.checkbox = res;
-            })
-        },
-        methods: {
-            keepAdmin(formName) {
-                this.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        let adminData = {
-                            "name": this.staffForm.name,
-                            "shopId": "5c27753e8ffaedc2a6bc4b71",
-                            "mobile": this.staffForm.account,
-                            "password": this.staffForm.checkPass,
-                            "permissionList": this.staffForm.type
-                        };
-                        this.$http.addShopAdmin(adminData).then((res) => {
-                            console.log(res);
-                            //this.$route.push('/staff');
-                        })
-                    }
-                })
-            }
-        }
     }
 </script>
 

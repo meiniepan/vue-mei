@@ -41,7 +41,7 @@
             </div>
         </el-form>
 
-        <el-radio-group v-model="orderStatus">
+       <!-- <el-radio-group v-model="orderStatus">
             <el-radio-button label="全部"></el-radio-button>
             <el-radio-button label="待付款"></el-radio-button>
             <el-radio-button label="待分单"></el-radio-button>
@@ -50,71 +50,79 @@
             <el-radio-button label="待评价"></el-radio-button>
             <el-radio-button label="已完成"></el-radio-button>
             <el-radio-button label="已关闭"></el-radio-button>
-        </el-radio-group>
+        </el-radio-group>-->
 
         <el-table
-                ref="orderListTable"
-                :data="tableData"
+                :data="orderData"
                 style="width: 100%">
             <el-table-column type="expand">
                 <template slot-scope="props">
                     <el-form label-position="left" inline class="demo-table-expand">
                         <el-form-item label="服务方式">
-                            <span>{{ props.row.name }}</span>
+                            <span>{{ props.row.type }}</span>
+                        </el-form-item>
+                        <el-form-item label="下单时间">
+                            <span>{{ props.row.createTime }}</span>
                         </el-form-item>
                         <el-form-item label="买家地址">
-                            <span>{{ props.row.address }}</span>
+                            <span>{{ props.row.contact + ' ' +props.row.mobile + ' ' +props.row.address }}</span>
                         </el-form-item>
-                        <el-form-item label="下单时间" :formatter="formatterTime">
-                            <span>{{ props.row.address }}</span>
-                        </el-form-item>
-                        <el-form-item label="店铺地址">
-                            <span>{{ props.row.address }}</span>
+                        <el-form-item label="">
+                            <span></span>
                         </el-form-item>
                     </el-form>
                 </template>
             </el-table-column>
             <el-table-column
-                    prop="id"
+                    prop="orderSerial"
                     label="订单ID"
-                    width="180"
                     align="center">
             </el-table-column>
             <el-table-column
-                    prop="name"
-                    label="商品名称"
-                    width="180"
+                    prop="serviceName"
+                    label="服务名称"
                     align="center">
+                <template slot-scope="scope">
+                    <img :src="scope.row.imageMain" style="display:inline-block;line-height: 20px" />
+                    <p style="display:inline-block;margin-top: 10px">{{ scope.row.serviceName }}</p>
+                </template>
             </el-table-column>
             <el-table-column
-                    prop="name"
+                    prop="price"
                     label="单价/数量"
-                    width="180"
                     align="center">
             </el-table-column>
             <el-table-column
-                    prop="address"
+                    prop="status"
                     label="订单状态"
+                    :filters="[{ text: '0', value: '0' }, { text: '1', value: '1' }]"
+                    :filter-method="filterTag"
+                    filter-placement="bottom-end"
                     align="center">
+                <template slot-scope="scope">
+                    <span>{{scope.row.status}}</span>
+                </template>
             </el-table-column>
             <el-table-column
-                    prop="address"
+                        prop="amount"
                     label="实付金额"
-                    :formatter="formatterPrice"
                     align="center">
             </el-table-column>
             <el-table-column
-                    prop="address"
+                    prop=""
                     label="操作"
                     align="center">
                 <template slot-scope="scope">
-                    <router-link :to="{path:'orderDetail', query:{orderId:scope.row.id}}">
-                        <el-button
-                                size="mini"
-                                type="primary"
-                                @click="navigateDetail(scope.row.id)">详情
-                        </el-button>
-                    </router-link>
+                    <el-button
+                            size="mini"
+                            type="primary"
+                            plain
+                            @click="navigateDetail(scope.row.orderImplId)">详情
+                    </el-button>
+                    <el-button
+                            size="mini"
+                            plain>完成
+                    </el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -122,6 +130,7 @@
 </template>
 
 <script>
+    import { timestampToString } from '../../http/common'
     export default {
         name: 'OrderList',
         props: {
@@ -146,12 +155,13 @@
                     '支付宝扫码付',
                     '支付宝app支付',
                 ],
-                tableData: [],
+                orderData: [],
+                //statusList: [],
             }
         },
 
         mounted() {
-            this.getOrderList();
+            this.getOrderList(1);
         },
 
 
@@ -165,47 +175,50 @@
                 alert(this.orderFilterTime[0]);
                 alert(this.orderFilterTime[1])
             },
-
-            formatterPrice(row) {
-                return row.address;
+            filterTag(value, row) {
+                return row.status === value;
             },
-
-            formatterTime(row) {
-                return row.address;
-            },
-
             resetForm(formName) {
                 this.$refs[formName].resetFields();
             },
-            async getOrderList() {
-                this.tableData.push({
-                    id: '1111111111111',
-                    date: '2016-05-02',
-                    name: '王小虎',
-                    address: '不知道是啥',
-                    tag: '家'
-                }, {
-                    id: '22222222222',
-                    date: '2016-05-04',
-                    name: '王1',
-                    address: '不知道是啥',
-                    tag: '公司'
-                }, {
-                    id: '3333333333',
-                    date: '2016-05-01',
-                    name: '王2',
-                    address: '不知道是啥',
-                    tag: '家'
-                }, {
-                    id: '444444444444',
-                    date: '2016-05-03',
-                    name: '王小虎',
-                    address: '不知道是啥',
-                    tag: '公司'
-                });
+            async getOrderList(direction) {
+
+                let data = {
+                    "shopId": this.$store.state.shopId,
+                    "direction": direction,
+                    "baseObjectId": "1",
+                    "statusList": [1]
+                };
+                this.$http.getOrderList(data)
+                    .then((res) => {
+                       for(let orderId in res) {
+                           let val = res[orderId];
+                           this.orderData.push({
+                               "serviceId": val.serviceId,
+                               "orderImplId": val.orderImplId,
+                               "address": val.address,
+                               "amount": val.amount,
+                               "contact": val.contact,
+                               "createTime": timestampToString(val.createTime),
+                               "imageMain": val.imageMain,
+                               "mobile": val.mobile,
+                               "orderSerial": val.orderSerial,
+                               "price": val.price,
+                               "serviceName": val.serviceName,
+                               "status": val.status.toString(),
+                               "type": val.type
+                           })
+                       }
+                    });
             },
-            navigateDetail(orderId) {
-                // this.$router.push({path: `/orderDetail/${orderId}`});
+            navigateDetail(orderImplId) {
+                this.$router.push({
+                    path: '/orderDetail',
+                    name: 'OrderDetail',
+                    params: {
+                        id: orderImplId
+                    }
+                });
             }
         },
 
@@ -222,7 +235,6 @@
 
     .order-list {
         width: 80%;
-        margin: 40px 10%;
     }
 
     .order-input {

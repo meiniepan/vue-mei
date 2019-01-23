@@ -1,22 +1,25 @@
 <template>
     <el-form :model="configForm" status-icon :rules="rules" ref="configForm" label-width="100px" class="">
         <el-form-item label="商家账号：" prop="merchantAccount">
-            <el-input type="merchantAccount" v-model="configForm.merchantAccount" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="验证码" prop="code">
-            <el-input type="code" v-model="configForm.code" autocomplete="off"></el-input>
+            <el-input type="text" v-model="configForm.merchantAccount" autocomplete="off" placeholder="请输入商家账号"></el-input>
         </el-form-item>
         <el-form-item label="短信验证码" prop="msgCode">
-            <el-input v-model.number="configForm.msgCode"></el-input>
-        </el-form-item>
-        <el-form-item label="设置新登录密码" prop="password">
-            <el-input v-model="configForm.password"></el-input>
-        </el-form-item>
-        <el-form-item label="确定新登录密码" prop="ensurePassword">
-            <el-input v-model="configForm.ensurePassword"></el-input>
+            <el-input v-model.number="configForm.msgCode" placeholder="请输入手机短信验证码"></el-input>
         </el-form-item>
         <el-form-item>
-            <el-button type="primary" @click="submitForm('configForm')">提交</el-button>
+            <el-button type="primary" @click="fetchMsgCode()">获取验证码</el-button>
+        </el-form-item>
+        <el-form-item label="输入旧密码" prop="oriPassword">
+            <el-input v-model="configForm.oriPassword" placeholder="请输入旧密码"></el-input>
+        </el-form-item>
+        <el-form-item label="设定新登录密码" prop="password">
+            <el-input v-model="configForm.password" placeholder="请输入密码"></el-input>
+        </el-form-item>
+        <el-form-item label="确定新登录密码" prop="ensurePassword" >
+            <el-input v-model="configForm.ensurePassword" placeholder="请再次输入密码"></el-input>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" @click="submitForm('configForm')">确认修改</el-button>
         </el-form-item>
     </el-form>
 </template>
@@ -28,22 +31,17 @@
                 if (!value) {
                     return callback(new Error('商家账号不能为空'));
                 }
-                const reg = /^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\d{8}$/;
-                if(!reg.test(value)){
-                    return callback(new Error('请填写正确格式的手机号码'))
-                }else {
-                    callback();
-                }
+                callback();
             };
-            var validateCheckCode = (rule, value, callback) => {
+            var checkMsgCode = (rule, value, callback) => {
                 if (!value) {
-                    return callback(new Error('验证码不能为空'));
+                    return callback(new Error('短信验证码不能为空'));
                 }
                 callback();
             };
-            var msgCode = (rule, value, callback) => {
+            var checkOriPassword = (rule, value, callback) => {
                 if (!value) {
-                    return callback(new Error('短信验证码不能为空'));
+                    return callback(new Error('旧密码不能为空'));
                 }
                 callback();
             };
@@ -65,7 +63,6 @@
             return {
                 configForm: {
                     merchantAccount: '',
-                    code: '',
                     msgCode: '',
                     password: '',
                     ensurePassword: ''
@@ -74,11 +71,11 @@
                     merchantAccount: [
                         { validator: validateAccount, trigger: 'blur', required :true}
                     ],
-                    checkPass: [
-                        { validator: validateCheckCode, trigger: 'blur' }
+                    msgCode: [
+                        { validator: checkMsgCode, trigger: 'blur', required :true}
                     ],
-                    code: [
-                        { validator: msgCode, trigger: 'blur', required :true}
+                    oriPassword:[
+                        { validator: checkOriPassword, trigger: 'blur', required :true}
                     ],
                     password: [
                         { validator: checkPassword, trigger: 'blur', required :true}
@@ -90,16 +87,46 @@
             };
         },
         methods: {
-            submitForm(formName) {
-                this.$refs[formName].validate((valid) => {
+            /*获取验证码*/
+            fetchMsgCode() {
+                let data = {
+                    value: this.$store.state.mobile
+                    // value: '17600672340'
+                }
+                this.$http.getCode(data); //发送验证码
+            },
+
+            submitForm(configForm) {
+                this.$refs[configForm].validate((valid) => {
                     if (valid) {
-                        alert('submit!');
+                        let codeData = {
+                            "mobile": this.$store.state.mobile,
+                            // "mobile": '17600672340',
+                            "captcha": this.configForm.msgCode
+                        };
+                        this.$http.checkCode(codeData).then((res) => {
+                            if (res === 200) {
+                                let params = {
+                                    "name": this.configForm.merchantAccount,
+                                    "oriPassword": this.configForm.oriPassword,
+                                    "newPassword": this.configForm.password
+                                };
+                                this.$http.configuration(params).then((res) => {
+                                    if (res === 200) {
+                                        this.$message.success('设置信息提交成功');
+                                    } else {
+                                        this.$message.error('设置信息提交失败');
+                                    }
+                                });
+                            }else {
+                                this.$message.error(res);
+                            }
+                        });
                     } else {
                         return false;
                     }
                 });
             }
-
         }
     }
 </script>

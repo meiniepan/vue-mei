@@ -14,10 +14,10 @@
                     </el-menu-item-group>
                 </el-submenu>
                 <el-submenu index="2">
-                    <template slot="title"><i class="el-icon-message"></i>商品</template>
+                    <template slot="title"><i class="el-icon-message"></i>服务</template>
                     <el-menu-item-group>
                         <template slot="title">
-                            <el-menu-item index="/goods">商品管理</el-menu-item>
+                            <el-menu-item index="/goods">服务管理</el-menu-item>
                         </template>
                     </el-menu-item-group>
                 </el-submenu>
@@ -58,14 +58,10 @@
                         </template>
                     </el-menu-item-group>
                 </el-submenu>
-                <el-submenu index="4">
-                    <template slot="title"><i class="el-icon-message"></i>技工</template>
-                    <el-menu-item-group>
-                        <template slot="title">
-                            <el-menu-item index="/workers">技工</el-menu-item>
-                        </template>
-                    </el-menu-item-group>
-                </el-submenu>
+                <el-menu-item index="/" @click="signOut">
+                    <i class="el-icon-setting"></i>
+                    <span slot="title">退出</span>
+                </el-menu-item>
             </el-menu>
         </el-aside>
         <el-container>
@@ -80,7 +76,27 @@
 
 <script>
     export default {
-        name: "Header"
+        name: "Header",
+        methods: {
+            signOut() {
+                this.$confirm('是否要退出登录?', '', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                }).then(() => {
+                    this.$store.commit('LOGIN_OUT');
+                    this.$message({
+                        type: 'success',
+                        message: '退出成功!'
+                    });
+                    this.$router.push('/login');
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消退出'
+                    });
+                });
+            }
+        },
     }
 </script>
 

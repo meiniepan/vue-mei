@@ -3,4 +3,5 @@
 ```
 yarn
 yarn run serve
+yarn test
 ```

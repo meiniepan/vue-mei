@@ -2,10 +2,10 @@
     <div class="inner">
         <div class="shop-overview">
             <div class="merchant-overview">
-                <img src="~@/assets/ld-bg.png" alt="">
+                <img :src="shopMsg.logo" alt="">
                 <div>
-                    <h2>商家店铺名称</h2>
-                    <span>创建店铺时间</span>
+                    <h2>{{shopMsg.name}}</h2>
+                    <span>{{shopMsg.createTime}}</span>
                 </div>
             </div>
             <div>
@@ -14,10 +14,10 @@
             </div>
         </div>
         <ul class="order-quantity">
-            <li>总订单数量<p>88</p></li>
-            <li>已付款订单数量<p>88</p></li>
+            <li>总订单数量<p>{{shopMsg.orderAmount}}</p></li>
+            <li>已付款订单数量<p>{{shopMsg.orderPaidAmount}}</p></li>
             <li>销售总额<p>88888</p></li>
-            <li>服务（商品）数量<p>88</p></li>
+            <li>服务（商品）数量<p>{{shopMsg.serviceAmount}}</p></li>
         </ul>
         <display-component></display-component>
         <div class="sales-statistics">
@@ -66,11 +66,13 @@
 
 <script>
     import DisplayComponent from './ShopOverview/Display'
+    import { timestampToString } from '../../http/common'
     export default {
         name: "ShopOverview",
         components: { DisplayComponent },
         data() {
             return {
+                shopMsg: {},
                 statisticsTable: [
                     {
                         number: '1',
@@ -89,6 +91,33 @@
                 ],
                 downloadState: 0,
             }
+        },
+        created () {
+            let data = {
+                "shopId": this.$store.state.shopId
+            };
+            this.$http.getShopMsg(data).then((res) => {
+                this.shopMsg = {
+                    name: res.name,
+                    logo: this.$ipfsUrl + res.logo,
+                    createTime: timestampToString(res.createTime),
+                    orderAmount: res.orderAmount,
+                    orderPaidAmount: res.orderPaidAmount,
+                    serviceAmount: res.serviceAmount
+                };
+            });
+            /*this.$http.getShopSalesVolume(data).then((res) => {
+                //console.log(res);
+                for(let goodsId in res){
+                    //console.log(res[goodsId]);
+                    let orderId = {
+                        serviceId: res[goodsId]
+                    };
+                    this.$http.getGoodsDetail(orderId).then((res) => {
+                        console.log(res)
+                    })
+                }
+            })*/
         },
         methods: {
             goodsAdd() {

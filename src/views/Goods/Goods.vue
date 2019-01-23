@@ -1,7 +1,7 @@
 <template>
     <div class="inner">
         <div class="add-search">
-            <el-button class="release-btn" @click="releaseGoods">发布商品</el-button>
+            <el-button class="release-btn" @click="releaseGoods">发布服务</el-button>
             <el-input placeholder="请输入名称"
                       suffix-icon="el-icon-search"></el-input>
         </div>
@@ -10,6 +10,7 @@
                 :data="goodsData"
                 tooltip-effect="dark"
                 style="width: 100%"
+                :default-sort = "{prop: 'createTime', order: 'descending'}"
                 @selection-change="batchSelectionGoods">
             <el-table-column
                     type="selection"
@@ -42,8 +43,8 @@
             </el-table-column>
             <el-table-column
                     prop="state"
-                    label="商品状态"
-                    :filters="[{ text: 0, value: 0 }, { text: 1, value: 1 }]"
+                    label="服务状态"
+                    :filters="stateArr"
                     :filter-method="filterTag"
                     filter-placement="bottom-end">
                 <template slot-scope="scope">
@@ -56,15 +57,15 @@
                     label="操作"
                     show-overflow-tooltip>
                 <template slot-scope="scope">
-                    <el-button @click="deleteGoods(scope.row)" type="text" size="small">删除</el-button>
-                    <el-button type="text" size="small" @click="releaseGoods(scope.row)">编辑</el-button>
+                    <el-button @click="deleteGoods(scope.row.serviceId, 1)" type="text" size="small">删除</el-button>
+                    <el-button type="text" size="small" @click="editGoods(scope.row)">编辑</el-button>
                 </template>
             </el-table-column>
         </el-table>
         <div class="goods-btn">
             <div>
                 <el-button @click="goodsShelves">下架</el-button>
-                <el-button>删除</el-button>
+                <el-button @click="deleteGoods(0,2)">删除</el-button>
             </div>
             <div>
                 <el-button @click="lastPage">上一页</el-button>
@@ -83,23 +84,22 @@
             return {
                 goodsData: [],
                 batchGoods: [],
-                page: 1,
+                stateList: [],
+                stateArr: [],
             }
         },
-        created() {
-            this.getGoodsData(this.page);
+        mounted() {
+            this.getGoodsData(1);
         },
         methods: {
             filterTag(value, row) {
                 return row.state === value;
             },
             lastPage() {
-                this.page-=1;
-                this.getGoodsData(this.page);
+                this.getGoodsData(0);
             },
             nextPage() { //下一页
-                this.page+=1;
-                this.getGoodsData(this.page);
+                this.getGoodsData(1);
             },
             batchSelectionGoods(val) {
                 this.batchGoods = [];
@@ -107,19 +107,40 @@
                     this.batchGoods.push(val[serviceId].serviceId);
                 }
             },
-            releaseGoods(row) { //发布或者编辑
-                this.$router.push('/goodsAdd')
+            releaseGoods() {
+                this.$router.push('/goodsAdd');
             },
-            deleteGoods(row) { //删除
-                console.log(row);
+            /*编辑服务*/
+            editGoods(row) { //发布或者编辑
+                this.$router.push({
+                    name: 'GoodsAdd',
+                    path: '/goodsAdd',
+                    params: {
+                        serviceId: row.serviceId
+                    }
+                })
+            },
+            /*删除服务*/
+            deleteGoods(row,index) { //删除
+                let data = {};
                 this.$confirm('确定要删除商品?', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                 }).then(() => {
-                    this.$message({
-                        type: 'success',
-                        message: '删除成功!'
-                    });
+                    if(index === 1){
+                        data = {serviceIdList: [row]};
+                    }else{
+                        data = {serviceIdList: this.batchGoods}
+                    }
+                    this.$http.goodsDelete(data)
+                        .then(() => {
+                            this.goodsData = [];
+                            this.getGoodsData(1);
+                            this.$message({
+                                type: 'success',
+                                message: '删除成功!'
+                            });
+                        });
                 }).catch(() => {
                     this.$message({
                         type: 'info',
@@ -127,14 +148,14 @@
                     });
                 });
             },
-            /*商品下架*/
+            /*下架服务*/
             goodsShelves() {
                 this.$confirm('确定要批量下架商品吗?', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                 }).then(() => {
                     let shelvesData = {
-                        shopId: 12,
+                        shopId: this.$store.state.shopId,
                         serviceId: this.batchGoods
                     };
                     this.$http.goodsShelves(shelvesData).then(() => {
@@ -142,6 +163,7 @@
                             type: 'success',
                             message: '下架成功!'
                         });
+                        this.goodsData = [];
                         this.getGoodsData(1);
                     });
                 }).catch(() => {
@@ -151,25 +173,58 @@
                     });
                 });
             },
-            /*获取所有商品*/
-            getGoodsData(page) {
-                this.goodsData = [];
+            /*获取所有服务*/
+            getGoodsData(direction) {
+                let baseData = '111';
+                if(this.goodsData.length !== 0){
+                    if(direction === 1){
+                        baseData = this.goodsData[this.goodsData.length-1].serviceId;
+                    }else{
+                        baseData = this.goodsData[0].serviceId;
+                    }
+                }
                 let shopData = {
-                    "shopId": 12,
-                    "page": page
+                    "shopId": this.$store.state.shopId,
+                    "baseObjectId": baseData,
+                    "direction": direction,
+                    "statusList": [5,6,7,8,9],
                 };
                 this.$http.getGoods(shopData).then((res) => {
-                    for(let item in res){
-                        this.goodsData.push({
-                            title: res[item].name,
-                            price: '¥'+res[item].price,
-                            stock: res[item].inventory,
-                            sales: res[item].sales,
-                            createTime: timestampToString(res[item].createTime),
-                            classify: res[item].tag,
-                            state: res[item].status,
-                            serviceId: res[item].serviceId
-                        });
+                    if(res.length === 0){
+                        this.$message.error('没有更多数据');
+                        return;
+                    }else {
+                        this.goodsData = [];
+                        for(let item in res){
+                            let val = res[item];
+                            let obj = {};
+                            let stateTag = [];
+                            let data = { statusValue : val.status };
+                            this.$http.getStatus(data)
+                                .then((res) => {
+                                    this.stateList.push({
+                                        text: res,
+                                        value: res
+                                    });
+                                    this.goodsData.push({
+                                        title: val.name,
+                                        price: '¥'+ val.price,
+                                        stock: val.inventory,
+                                        sales: val.sales,
+                                        createTime: timestampToString(val.createTime),
+                                        classify: val.tagName,
+                                        state: res,
+                                        serviceId: val.serviceId,
+                                    });
+                                    for(let i = 0; i < this.stateList.length; i++){
+                                        if(!obj[this.stateList[i].value]){
+                                            stateTag.push(this.stateList[i]);
+                                            obj[this.stateList[i].value] = true;
+                                        }
+                                    }
+                                });
+                            this.stateArr = stateTag;
+                        }
                     }
                 })
             }

@@ -1,9 +1,14 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import store from './store'
 
-/*登陆*/
+/*登录*/
 import Login from './views/Login/Login'
 import ForgetPassword from './views/Login/ForgetPassword'
+import Register from './views/Login/Register'
+
+/*第一次注册店铺*/
+import CreateShop from './views/CreateShop/CreateShop'
 
 import Header from './views/Header'
 
@@ -40,12 +45,13 @@ import OrderDetail from '@/views/Order/OrderDetail'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   mode: 'history',
   base: process.env.BASE_URL,
   routes: [
     {
-      path: '/',
+      path: '/login',
+      name: 'Login',
       component: Login
     },
     {
@@ -53,87 +59,175 @@ export default new Router({
       component: ForgetPassword
     },
     {
-      path: '/overview',
-      name: 'header',
+      path: '/register',
+      component: Register,
+    },
+    {
+      path: '/createShop',
+      name: 'CreateShop',
+      component: CreateShop,
+    },
+    {
+      path: '/',
+      name: 'Header',
       component: Header,
+      redirect: '/overview',
       children: [
           {
             path: '/overview',
-            component: ShopOverview
+            name: 'ShopOverview',
+            component: ShopOverview,
+            meta: {
+              requireAuth: true
+            },
           },
           {
               path: '/content',
-              component: ShopContent
+              name: 'ShopContent',
+              component: ShopContent,
+              meta: {
+                  requireAuth: true
+              },
           },
           {
               path: '/info',
-              component: InterpriseInfo
+              name: 'InterpriseInfo',
+              component: InterpriseInfo,
+              meta: {
+                  requireAuth: true
+              },
           },
           {
               path: '/staff',
-              component: ShopStaff
+              name: 'ShopStaff',
+              component: ShopStaff,
+              meta: {
+                  requireAuth: true
+              },
           },
           {
               path: '/goods',
+              name: 'Goods',
               component: Goods,
+              meta: {
+                  requireAuth: true
+              },
           },
           {
               path: '/goodsAdd',
-              component: GoodsAdd
+              name: 'GoodsAdd',
+              component: GoodsAdd,
+              meta: {
+                  requireAuth: true
+              },
           },
           {
               path: '/goodsModify',
-              component: GoodsModify
+              name: 'GoodsModify',
+              component: GoodsModify,
+              meta: {
+                  requireAuth: true
+              },
           },
           {
               path: '/asset',
-              component: IncomeOverview
+              name: 'IncomeOverview',
+              component: IncomeOverview,
+              meta: {
+                  requireAuth: true
+              },
           },
           {
               path: '/order',
-              component: OrderAccount
+              name: 'OrderAccount',
+              component: OrderAccount,
+              meta: {
+                  requireAuth: true
+              },
           },
           {
               path:'/orderList',
-              component:OrderList
+              name: 'OrderList',
+              component:OrderList,
+              meta: {
+                  requireAuth: true
+              },
           },
           {
               path:'/orderOverview',
-              component:OrderOverview
+              name: 'OrderOverview',
+              component:OrderOverview,
+              meta: {
+                  requireAuth: true
+              },
           },
           {
-              path:'orderDetail',
-              component:OrderDetail
+              path:'/orderDetail',
+              name: 'OrderDetail',
+              component:OrderDetail,
+              meta: {
+                  requireAuth: true
+              },
           },
           {
               path: '/customer',
-              component: Customer
+              name: 'Customer',
+              component: Customer,
+              meta: {
+                  requireAuth: true
+              },
           },
           {
               path: '/workers',
-              component: Workers
+              name: 'Workers',
+              component: Workers,
+              meta: {
+                  requireAuth: true
+              },
           },
           {
               path: '/addWorker',
-              component: AddWorker
+              name: 'AddWorker',
+              component: AddWorker,
+              meta: {
+                  requireAuth: true
+              },
           },
           {
               path: '/editWorker',
-              component: EditWorker
+              name: 'EditWorker',
+              component: EditWorker,
+              meta: {
+                  requireAuth: true
+              },
           },
           {
               path: '/configuration',
-              component: Configuration
+              name: 'Configuration',
+              component: Configuration,
+              meta: {
+                  requireAuth: true
+              },
           }
       ]
     },
-    /*{
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/!* webpackChunkName: "about" *!/ './views/About.vue')
-    }*/
   ]
-})
+});
+
+//  判断是否需要登录权限 以及是否登录
+router.beforeEach((to, from, next) => {
+    if (to.matched.some(res => res.meta.requireAuth)) {// 判断是否需要登录权限
+        if (sessionStorage.getItem('shopId')) {// 判断是否登录
+            next()
+        } else {// 没登录则跳转到登录界面
+            next({
+                path: '/login',
+                query: {redirect: to.fullPath}
+            })
+        }
+    } else {
+        next()
+    }
+});
+
+export default router;

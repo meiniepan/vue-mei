@@ -1,6 +1,6 @@
 <template>
     <div class="inner">
-        <el-form ref="goodsForm" :model="goodsForm" label-width="120px" class="data-form">
+        <el-form ref="goodsForm" :rules="rules" :model="goodsForm" label-width="120px" class="data-form">
             <el-row>
                 <el-col :span="4"><div class="grid-content bg-purple">基本信息</div></el-col>
                 <el-col :span="20">
@@ -9,9 +9,10 @@
                     </el-form-item>
                     <el-form-item label="服务图片：">
                         <el-upload style="text-align: left"
-                                   action="http://192.168.1.251:5000/files/add"
+                                   :action="$imgUrl"
                                    accept="image/jpeg,image/gif,image/png"
                                    list-type="picture-card"
+                                   :file-list="goodsForm.serviceImg"
                                    :on-success="uploadSuccess"
                                    :on-preview="handlePictureCardPreview"
                                    :on-remove="handleRemove">
@@ -30,7 +31,7 @@
                         <el-checkbox v-model="priceType" label="勾选不显示" name="priceType"></el-checkbox>
                     </el-form-item>
                     <el-form-item label="促销广告语：" class="flex-style">
-                        <el-input v-model="goodsForm.advert"></el-input>
+                        <el-input v-model="goodsForm.advert" :disabled="advertType"></el-input>
                         <el-checkbox v-model="advertType" label="勾选不显示" name="advertType"></el-checkbox>
                     </el-form-item>
                 </el-col>
@@ -41,7 +42,7 @@
                 <el-col :span="20">
                     <el-form-item label="选择分类：">
                         <el-select v-model="goodsForm.classify" placeholder="请选择分类">
-                            <el-option v-for="(classify,key) in classifyList" :key="key" :label="classify" :value="classify"></el-option>
+                            <el-option v-for="(classify,key) in classifyList" :key="key" :label="classify.name" :value="classify.id"></el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
@@ -142,49 +143,46 @@
     export default {
         name: "GoodsAdd",
         components: {Editor},
-        data() {
-            return {
-                goodsForm: {
-                    serviceName: '', //服务名称
-                    dialogImageUrl: '',
-                    dialogVisible: false,
-                    serviceImg: [], //服务图片
-                    unit: '', //计量单位
-                    price: '', //市场价
-                    advert: '', //广告语
-                    classify: '', //服务分类
-                    spec: '1',//是否有规格 0：无    1：有
-                    addSpec: [{
-                        specName: '',
-                        unitPrice: '',
-                        stock: ''
-                    }], //规格数组
-                    totalInventory: '', //总库存
-                    orderForm: '0', //上门方式 0：上门 1：站点
-                    orderCost: '', //上门费用
-                    interval: '请选择', //时间间隔
-                    times: [], //时间段
-                    tinymceHtml: '', //富文本
-                },
-                priceType: false, //市场价显示否
-                advertType: false, //广告语显示否
-                intervalArr: [2,3,4,6], //时间间隔数组
-                timePeriod: [],
-                classifyList: [],   //分类列表
-                init: {
-                    language_url: '/tinymce/zh_CN.js',
-                    language: 'zh_CN',
-                    skin_url: '/tinymce/skins/lightgray',
-                    height: 300,
-                    plugins: 'link lists image code table colorpicker textcolor wordcount contextmenu',
-                    toolbar:
-                        'bold italic underline strikethrough | fontsizeselect | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | outdent indent blockquote | undo redo | link unlink image code | removeformat',
-                    images_upload_handler: (blobInfo, success, failure) => {
-                        const img = 'data:image/jpeg;base64,' + blobInfo.base64();
-                        success(img)
-                    }
-                },
-            }
+        watch: {
+            'goodsForm.serviceName': function (newData, oldData) { //服务名字
+                if(oldData){this.$set(this.modifyData, 'name', newData);}
+            },
+            'goodsForm.serviceImg': function (newData, oldData) {
+                if(newData.length !==  oldData.length){
+                    this.$set(this.modifyData, 'images', newData);
+                }
+            },
+            'goodsForm.price': function (newData, oldData) { //市场价格
+                if(oldData){this.$set(this.modifyData, 'price', newData);}
+            },
+            'advertType': function (newData) { //广告语是否显示 0：不显示 1：显示
+                if(newData === undefined){
+                    //console.log(this.modifyData);
+                }else{
+                    this.goodsForm.advert = '';
+                    this.$set(this.modifyData, 'adWordStatus', newData === true ? 0 : 1);
+                }
+            },
+            'goodsForm.advert': function (newData) { //广告语
+                if(this.advertType === false){
+                    this.$set(this.modifyData, 'adWord', newData);
+                }
+            },
+            'goodsForm.classify': function (newData, oldData) { //服务分类
+                if(oldData){this.$set(this.modifyData, 'tag', newData);}
+            },
+            'goodsForm.totalInventory': function (newData, oldData) { //库存
+                if(oldData){this.$set(this.modifyData, 'inventory', newData);}
+            },
+            'goodsForm.orderForm': function (newData) { //服务方式
+                this.$set(this.modifyData, 'type', Number(newData));
+            },
+            'goodsForm.orderCost': function(newData, oldData) { //上门费
+                if(oldData){this.$set(this.modifyData, 'underline', newData);}
+            },
+            'goodsForm.tinymceHtml': function (newData, oldData) { //富文本
+                if(oldData){this.$set(this.modifyData, 'content', newData)}
+            },
         },
         created() {
             let classify = {
@@ -192,32 +190,69 @@
             };
             this.$http.getClassify(classify).then((res) => {
                 this.classifyList = res;
-            })
+            });
+            if(this.$route.params.serviceId){ //编辑
+                this.serviceId = this.$route.params.serviceId;
+                let detailData = {
+                    serviceId: this.serviceId
+                };
+                this.$http.getGoodsDetail(detailData)
+                    .then((res) => {
+                        let specArr = [];
+                        for(let imgUrl in res.images){
+                            this.goodsForm.serviceImg.push({
+                                response:{data:{fileHash: res.images[imgUrl]}},
+                                url: 'http://192.168.1.186:8081/ipfs/' + res.images[imgUrl]
+                            });
+                        }
+                        for(let item in res.specification){
+                            specArr.push(JSON.parse(res.specification[item]));
+                        }
+                        this.advertType = res.adWordStatus === 0 ? true : false;
+                        this.advertType === true ? res.adWord = '' : res.adWord;
+                        this.goodsForm = {
+                            serviceName: res.name,
+                            serviceImg: this.goodsForm.serviceImg,
+                            price: res.price,
+                            advert: res.adWord,
+                            classify: res.tag,
+                            addSpec: specArr,
+                            spec: res.specification.length > 0 ? '1' : '0',
+                            totalInventory: res.inventory,
+                            orderForm: res.type.toString(),
+                            orderCost: res.underline,
+                            tinymceHtml: res.content
+                        };
+                    });
+            }
         },
         mounted () {
             tinymce.init({});
         },
         methods: {
             uploadSuccess(response, file, fileList) {
+                //if(){}
                 this.goodsForm.serviceImg = [];
-                if(response.status === 200){
+                if(response.code === 200){
                     for(let file in fileList){
-                        this.goodsForm.serviceImg.push(fileList[file].response.fileHash)
+                        this.goodsForm.serviceImg.push(fileList[file].response.data.fileHash)
                     }
                 }
             },
             handleRemove(file, fileList) {
-                console.log(file, fileList);
+                this.goodsForm.serviceImg = [];
+                for(let file in fileList){
+                    this.goodsForm.serviceImg.push(fileList[file].response.data.fileHash)
+                }
+
             },
             handlePictureCardPreview(file) {
                 this.goodsForm.dialogImageUrl = file.url;
                 this.goodsForm.dialogVisible = true;
             },
             deleteRow(index) {
-                console.log(this.goodsForm.addSpec.length);
                 if(this.goodsForm.addSpec.length <= 1){
                     return;
-                    console.log(11);
                 }else{
                     this.goodsForm.addSpec.splice(index, 1);
                 }
@@ -261,32 +296,93 @@
                     }
                 }
             },
-            submitAudit() {
+            submitAudit() { //编辑
                 let specArr = [];
                 for(let item in this.goodsForm.addSpec){
                     specArr.push(JSON.stringify(this.goodsForm.addSpec[item]));
                 }
-                /*市场价格*/
-                this.priceType === true ? this.goodsForm.price = 0 : this.goodsForm.price;
-                let data = {
-                    "shopId": 12,
-                    "name": this.goodsForm.serviceName, //服务名称
-                    "images": this.goodsForm.serviceImg, //服务图片
-                    "price": this.goodsForm.price, //市场价,
-                    "tag": this.goodsForm.classify, //服务分类
-                    "specification": specArr, //服务规格
-                    "inventory": this.goodsForm.totalInventory, //库存
-                    "type": Number(this.goodsForm.orderForm), //服务方式
-                    "underline": this.goodsForm.orderCost, //上门费用
-                    "content": this.goodsForm.tinymceHtml, //详情
-                };
-                this.$http.addGoods(data).then((res) => {
-                    if(res.status === 200){
+                if(this.serviceId !== ''){
+                    this.$set(this.modifyData, 'specification', specArr);
+                    this.$http.modifyGoods(this.modifyData).then(() => {
                         this.$router.push('/goods');
-                    }
-                });
+                    })
+                }else{ //新建
+                    /*广告语*/
+                    let data = {
+                        "shopId": this.$store.state.shopId,
+                        "name": this.goodsForm.serviceName, //服务名称
+                        "images": this.goodsForm.serviceImg, //服务图片
+                        "price": this.goodsForm.price, //市场价,
+                        //"adWord": this.goodsForm.advert, //广告语
+                        "adWordStatus": this.advertType === true ? 0 : 1,
+                        "tagId": this.goodsForm.classify, //服务分类
+                        "specification": specArr, //服务规格
+                        "inventory": this.goodsForm.totalInventory, //库存
+                        "type": Number(this.goodsForm.orderForm), //服务方式
+                        "underline": this.goodsForm.orderCost, //上门费用
+                        "content": this.goodsForm.tinymceHtml, //详情
+                    };
+                    if(this.advertType === false) this.$set(data, 'adWord', this.goodsForm.advert);
+                    this.$http.addGoods(data).then((res) => {
+                        if(res === 200){
+                            this.$router.push('/goods');
+                        }
+                    });
+                }
             }
-        }
+        },
+        data() {
+            return {
+                goodsForm: {
+                    serviceName: '', //服务名称
+                    dialogImageUrl: '',
+                    dialogVisible: false,
+                    serviceImg: [], //服务图片
+                    unit: '', //计量单位
+                    price: '', //市场价
+                    advert: '', //广告语
+                    classify: '', //服务分类
+                    spec: '1',//是否有规格 0：无    1：有
+                    addSpec: [{
+                        specName: '',
+                        unitPrice: '',
+                        stock: ''
+                    }], //规格数组
+                    totalInventory: '', //总库存
+                    orderForm: '0', //服务方式 0：上门 1：站点
+                    orderCost: '', //上门费用
+                    interval: '请选择', //时间间隔
+                    times: [], //时间段
+                    tinymceHtml: '', //富文本
+                },
+                priceType: false, //市场价显示否
+                advertType: false, //广告语显示否
+                intervalArr: [2,3,4,6], //时间间隔数组
+                timePeriod: [],
+                classifyList: [],   //分类列表
+                init: {
+                    language_url: '/tinymce/zh_CN.js',
+                    language: 'zh_CN',
+                    skin_url: '/tinymce/skins/lightgray',
+                    height: 300,
+                    plugins: 'link lists image code table colorpicker textcolor wordcount contextmenu',
+                    toolbar:
+                        'bold italic underline strikethrough | fontsizeselect | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | outdent indent blockquote | undo redo | link unlink image code | removeformat',
+                    images_upload_handler: (blobInfo, success) => {
+                        const img = 'data:image/jpeg;base64,' + blobInfo.base64();
+                        success(img)
+                    }
+                },
+                serviceId: '',
+                imgArr: [],
+                modifyData: {
+                    "serviceId": this.$route.params.serviceId,
+                }, //修改后的数据
+                rules: {
+
+                }
+            }
+        },
     }
 </script>
 
